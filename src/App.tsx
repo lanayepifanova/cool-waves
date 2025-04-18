@@ -267,8 +267,9 @@ export default function App() {
                   min={0.1}
                   max={1}
                   step={0.05}
+                  orientation="horizontal"
                   onValueChange={(value) => setShaderSpeed(value[0])}
-                  className="w-full [&_[data-slot=slider-track]]:h-1.5 [&_[data-slot=slider-track]]:bg-white/10 [&_[data-slot=slider-range]]:bg-white/70 [&_[data-slot=slider-thumb]]:size-3 [&_[data-slot=slider-thumb]]:border-white/50 [&_[data-slot=slider-thumb]]:bg-white"
+                  className="w-36 [&_[data-slot=slider-track]]:h-1.5 [&_[data-slot=slider-track]]:bg-white/10 [&_[data-slot=slider-range]]:bg-white/70 [&_[data-slot=slider-thumb]]:size-3 [&_[data-slot=slider-thumb]]:border-white/50 [&_[data-slot=slider-thumb]]:bg-white"
                 />
                 <span className="text-[9px] font-light uppercase tracking-[0.24em] text-white/50">
                   {Math.round(shaderSpeed * 100)}%
