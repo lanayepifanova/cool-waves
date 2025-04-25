@@ -83,6 +83,10 @@ export default function App() {
   const [phaseTimeLeftMs, setPhaseTimeLeftMs] = useState(
     breathPatterns[0].durations.inhale * 1000,
   );
+  const sessionOptions = [1, 3, 5, 10];
+  const [sessionMinutes, setSessionMinutes] = useState(5);
+  const [sessionRemainingMs, setSessionRemainingMs] = useState(sessionMinutes * 60 * 1000);
+  const [showSessionComplete, setShowSessionComplete] = useState(false);
 
   const currentPattern = breathPatterns.find(
     (pattern) => pattern.id === selectedPatternId,
@@ -137,6 +141,22 @@ export default function App() {
     }
   }, [currentPhase.key, currentDurations]);
 
+  const formatSessionTime = (remainingMs: number) => {
+    const totalSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
+  const startSession = (minutes: number) => {
+    setSessionMinutes(minutes);
+    setSessionRemainingMs(minutes * 60 * 1000);
+    setShowSessionComplete(false);
+    setIsRunning(true);
+    setPhaseIndex(0);
+    setPhaseTimeLeftMs(phases[0].duration * 1000);
+  };
+
   // Set dark mode
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -178,6 +198,13 @@ export default function App() {
     if (!isRunning) return;
 
     const timer = window.setTimeout(() => {
+      if (sessionRemainingMs <= 100) {
+        setSessionRemainingMs(0);
+        setIsRunning(false);
+        setShowSessionComplete(true);
+        return;
+      }
+
       if (phaseTimeLeftMs <= 100) {
         const nextIndex = (phaseIndex + 1) % phases.length;
         setPhaseIndex(nextIndex);
@@ -185,10 +212,12 @@ export default function App() {
       } else {
         setPhaseTimeLeftMs((prev) => prev - 100);
       }
+
+      setSessionRemainingMs((prev) => Math.max(0, prev - 100));
     }, 100);
 
     return () => window.clearTimeout(timer);
-  }, [isRunning, phaseIndex, phaseTimeLeftMs, phases]);
+  }, [isRunning, phaseIndex, phaseTimeLeftMs, phases, sessionRemainingMs]);
 
   const timeLeftSeconds = Math.max(0, Math.ceil(phaseTimeLeftMs / 1000));
   const phaseScale = phaseScaleTargets[currentPhase.key];
@@ -253,11 +282,40 @@ export default function App() {
         <Button
           variant="secondary"
           size="sm"
-          onClick={() => setIsRunning((prev) => !prev)}
+          onClick={() => {
+            if (showSessionComplete || sessionRemainingMs <= 0) {
+              startSession(sessionMinutes);
+              return;
+            }
+            setIsRunning((prev) => !prev);
+          }}
           className="px-6 py-2 bg-secondary/30 backdrop-blur-sm hover:bg-secondary/50 rounded-full h-auto"
         >
-          {isRunning ? "Pause" : "Resume"}
+          {showSessionComplete ? "Restart" : isRunning ? "Pause" : "Resume"}
         </Button>
+        <div className="mt-5 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/50">
+          Session · {formatSessionTime(sessionRemainingMs)}
+        </div>
+        <div className="mt-2 flex items-center gap-2">
+          {sessionOptions.map((minutes) => {
+            const isActive = sessionMinutes === minutes;
+            return (
+              <Button
+                key={minutes}
+                variant={isActive ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => startSession(minutes)}
+                className={`h-8 rounded-full px-3 text-xs ${
+                  isActive
+                    ? "bg-white text-black hover:bg-white/90"
+                    : "text-white/70 hover:text-white hover:bg-white/10"
+                }`}
+              >
+                {minutes}m
+              </Button>
+            );
+          })}
+        </div>
       </div>
       <div className="fixed right-4 top-4 z-20">
         <Button
@@ -271,10 +329,28 @@ export default function App() {
       </div>
       </div>
 
+      {showSessionComplete && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="flex max-w-xs flex-col items-center gap-4 rounded-2xl border border-white/10 bg-black/80 px-6 py-6 text-center text-white shadow-xl">
+            <div className="text-lg font-semibold">Session complete</div>
+            <div className="text-sm text-white/70">
+              Nice work. Take a moment or start another round.
+            </div>
+            <Button
+              size="sm"
+              className="rounded-full bg-white px-6 text-black hover:bg-white/90"
+              onClick={() => startSession(sessionMinutes)}
+            >
+              Start again
+            </Button>
+          </div>
+        </div>
+      )}
+
       <Sheet open={showSettings} onOpenChange={setShowSettings}>
         <SheetContent
           side="right"
-          className="top-4 bottom-auto right-4 h-auto max-h-[70vh] w-[min(90vw,320px)] rounded-2xl border border-white/10 bg-black/90 text-white backdrop-blur-xl"
+          className="top-4 bottom-auto right-4 h-auto max-h-[50vh] w-[min(90vw,320px)] rounded-2xl border border-white/10 bg-black/90 text-white backdrop-blur-xl"
         >
           <SheetHeader>
             <SheetTitle className="text-sm font-semibold tracking-[0.08em] text-white/70 uppercase">
