@@ -83,10 +83,11 @@ export default function App() {
   const [phaseTimeLeftMs, setPhaseTimeLeftMs] = useState(
     breathPatterns[0].durations.inhale * 1000,
   );
-  const sessionOptions = [1, 3, 5, 10];
   const [sessionMinutes, setSessionMinutes] = useState(5);
   const [sessionRemainingMs, setSessionRemainingMs] = useState(sessionMinutes * 60 * 1000);
   const [showSessionComplete, setShowSessionComplete] = useState(false);
+  const [isEditingSession, setIsEditingSession] = useState(false);
+  const [sessionDraft, setSessionDraft] = useState(String(sessionMinutes));
 
   const currentPattern = breathPatterns.find(
     (pattern) => pattern.id === selectedPatternId,
@@ -156,6 +157,18 @@ export default function App() {
     setPhaseIndex(0);
     setPhaseTimeLeftMs(phases[0].duration * 1000);
   };
+  const commitSessionDraft = () => {
+    const parsed = Number(sessionDraft);
+    if (!Number.isFinite(parsed)) {
+      setSessionDraft(String(sessionMinutes));
+      setIsEditingSession(false);
+      return;
+    }
+    const clamped = Math.max(1, Math.min(60, Math.round(parsed)));
+    setSessionDraft(String(clamped));
+    setIsEditingSession(false);
+    startSession(clamped);
+  };
 
   // Set dark mode
   useEffect(() => {
@@ -193,6 +206,11 @@ export default function App() {
     setPhaseIndex(0);
     setPhaseTimeLeftMs(phases[0].duration * 1000);
   }, [phases]);
+  useEffect(() => {
+    if (!isEditingSession) {
+      setSessionDraft(String(sessionMinutes));
+    }
+  }, [isEditingSession, sessionMinutes]);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -276,9 +294,6 @@ export default function App() {
         </motion.div>
 
       <div className="fixed left-4 top-4 z-20">
-        <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/60">
-          {currentPattern?.name ?? "Breathwork"}
-        </div>
         <Button
           variant="secondary"
           size="sm"
@@ -293,31 +308,47 @@ export default function App() {
         >
           {showSessionComplete ? "Restart" : isRunning ? "Pause" : "Resume"}
         </Button>
-        <div className="mt-2 flex items-center gap-2">
-          {sessionOptions.map((minutes) => {
-            const isActive = sessionMinutes === minutes;
-            return (
-              <Button
-                key={minutes}
-                variant={isActive ? "secondary" : "ghost"}
-                size="sm"
-                onClick={() => startSession(minutes)}
-                className={`h-8 rounded-full px-3 text-xs ${
-                  isActive
-                    ? "bg-white text-black hover:bg-white/90"
-                    : "text-white/70 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                {minutes}m
-              </Button>
-            );
-          })}
-        </div>
       </div>
       <div className="fixed left-4 top-4 z-30">
-        <div className="rounded-full border border-white/15 bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70 backdrop-blur-sm">
-          Session · {formatSessionTime(sessionRemainingMs)}
+        <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/60">
+          {currentPattern?.name ?? "Breathwork"}
         </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsEditingSession(true)}
+          className="h-auto rounded-full border border-white/15 bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70 hover:bg-black/70"
+        >
+          {isEditingSession ? (
+            <span className="flex items-center gap-2">
+              <span>Session</span>
+              <Input
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={60}
+                value={sessionDraft}
+                onChange={(event) => setSessionDraft(event.target.value)}
+                onBlur={commitSessionDraft}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    commitSessionDraft();
+                  }
+                  if (event.key === "Escape") {
+                    setSessionDraft(String(sessionMinutes));
+                    setIsEditingSession(false);
+                  }
+                }}
+                className="h-6 w-12 rounded-md border-white/20 bg-white/10 px-2 text-center text-[10px] text-white"
+                autoFocus
+                aria-label="Session minutes"
+              />
+              <span>min</span>
+            </span>
+          ) : (
+            <>Session · {formatSessionTime(sessionRemainingMs)}</>
+          )}
+        </Button>
       </div>
       <div className="fixed right-4 top-4 z-20">
         <Button
