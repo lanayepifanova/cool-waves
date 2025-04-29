@@ -275,7 +275,7 @@ export const ShaderCanvas = ({
   return (
     <canvas 
       ref={canvasRef} 
-      className="rounded-full transition-transform duration-300" 
+      className="shader-canvas" 
       style={{ 
         width: size, 
         height: size,

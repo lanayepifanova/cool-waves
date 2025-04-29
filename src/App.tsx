@@ -2,10 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { ShaderCanvas } from "./components/ShaderCanvas";
 import { CenterBreathDisplay } from "./components/CenterBreathDisplay";
 import { motion } from "framer-motion";
-import { Button } from "./components/ui/button";
 import SettingsPage from "./components/SettingsPage";
-import "./styles/sonner-fixes.css";
-import "./styles/input-fixes.css";
 
 type BreathPhaseKey = "inhale" | "hold" | "exhale" | "rest";
 
@@ -206,19 +203,19 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center relative">
-      <div className="relative flex flex-col items-center justify-center">
+    <div className="app-root">
+      <div className="app-stage">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="relative"
+          className="app-stage-inner"
         >
           <motion.div
             initial={{ scale: smallScale }}
             animate={{ scale: phaseScale }}
             transition={phaseTransition}
-            className="relative"
+            className="app-canvas-wrap"
           >
             <ShaderCanvas
               size={canvasSize}
@@ -238,37 +235,32 @@ export default function App() {
         </motion.div>
       </div>
 
-      <div className="fixed left-1/2 top-4 z-30 -translate-x-1/2 px-2">
-        <div className="rounded-full border border-white/15 bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70">
+      <div className="app-session-badge">
+        <div className="app-session-pill">
           Session · {formatSessionTime(sessionRemainingMs)}
         </div>
       </div>
-      <div className="fixed right-0 top-4 z-20 px-3">
-        <div className="relative flex flex-col items-end gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 rounded-full border border-white/20 bg-white/10 px-3 text-[9px] font-semibold uppercase tracking-[0.26em] text-white/85 shadow-[0_0_0_1px_rgba(255,255,255,0.06)] hover:bg-white/15"
-            onClick={() => setShowSettings(true)}
-          >
-            Settings
-          </Button>
-        </div>
+      <div className="app-settings">
+        <button
+          className="app-settings-button"
+          onClick={() => setShowSettings(true)}
+        >
+          Settings
+        </button>
       </div>
       {showSessionComplete && (
-        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="flex max-w-xs flex-col items-center gap-4 rounded-2xl border border-white/10 bg-black/80 px-6 py-6 text-center text-white shadow-xl">
-            <div className="text-lg font-semibold">Session complete</div>
-            <div className="text-sm text-white/70">
+        <div className="app-overlay">
+          <div className="app-modal">
+            <div className="app-modal-title">Session complete</div>
+            <div className="app-modal-text">
               Nice work. Take a moment or start another round.
             </div>
-            <Button
-              size="sm"
-              className="rounded-full bg-white px-6 text-black hover:bg-white/90"
+            <button
+              className="app-primary-button"
               onClick={() => startSession(sessionMinutes)}
             >
               Start again
-            </Button>
+            </button>
           </div>
         </div>
       )}
