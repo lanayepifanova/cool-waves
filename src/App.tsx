@@ -293,9 +293,6 @@ export default function App() {
         >
           {showSessionComplete ? "Restart" : isRunning ? "Pause" : "Resume"}
         </Button>
-        <div className="mt-5 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/50">
-          Session · {formatSessionTime(sessionRemainingMs)}
-        </div>
         <div className="mt-2 flex items-center gap-2">
           {sessionOptions.map((minutes) => {
             const isActive = sessionMinutes === minutes;
@@ -315,6 +312,11 @@ export default function App() {
               </Button>
             );
           })}
+        </div>
+      </div>
+      <div className="fixed left-4 top-4 z-30">
+        <div className="rounded-full border border-white/15 bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70 backdrop-blur-sm">
+          Session · {formatSessionTime(sessionRemainingMs)}
         </div>
       </div>
       <div className="fixed right-4 top-4 z-20">
