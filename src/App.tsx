@@ -4,16 +4,6 @@ import { CenterBreathDisplay } from "./components/CenterBreathDisplay";
 import { motion } from "framer-motion";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "./components/ui/sheet";
-import { Slider } from "./components/ui/slider";
 import "./styles/sonner-fixes.css";
 import "./styles/input-fixes.css";
 
@@ -63,21 +53,9 @@ const breathPatterns: BreathPattern[] = [
   },
 ];
 
-const defaultDurationsById = breathPatterns.reduce(
-  (acc, pattern) => {
-    acc[pattern.id] = { ...pattern.durations };
-    return acc;
-  },
-  {} as Record<string, Record<BreathPhaseKey, number>>,
-);
-
 export default function App() {
   const [canvasSize, setCanvasSize] = useState(600);
-  const [showSettings, setShowSettings] = useState(false);
   const [selectedPatternId, setSelectedPatternId] = useState(breathPatterns[0].id);
-  const [patternDurations, setPatternDurations] = useState(() => ({
-    ...defaultDurationsById,
-  }));
   const [isRunning, setIsRunning] = useState(true);
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [phaseTimeLeftMs, setPhaseTimeLeftMs] = useState(
@@ -94,7 +72,7 @@ export default function App() {
   );
 
   const currentDurations = currentPattern
-    ? patternDurations[currentPattern.id]
+    ? currentPattern.durations
     : breathPatterns[0].durations;
 
   const phases = useMemo(
@@ -241,24 +219,6 @@ export default function App() {
   const phaseScale = phaseScaleTargets[currentPhase.key];
   const phaseShaderId = phaseShaderTargets[currentPhase.key];
 
-  const updateDuration = (key: BreathPhaseKey, value: number) => {
-    if (!currentPattern) return;
-    setPatternDurations((prev) => ({
-      ...prev,
-      [currentPattern.id]: {
-        ...prev[currentPattern.id],
-        [key]: value,
-      },
-    }));
-  };
-
-  const handleDurationInput = (key: BreathPhaseKey, rawValue: string) => {
-    const parsed = Number(rawValue);
-    if (!Number.isFinite(parsed)) return;
-    const clamped = Math.max(0, Math.min(12, Math.round(parsed)));
-    updateDuration(key, clamped);
-  };
-
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center relative">
       {/* Main layout container with shader */}
@@ -278,7 +238,6 @@ export default function App() {
           >
             <ShaderCanvas
               size={canvasSize}
-              onClick={() => setShowSettings(true)}
               hasActiveReminders={false}
               hasUpcomingReminders={false}
               shaderId={phaseShaderId}
@@ -295,7 +254,7 @@ export default function App() {
 
       </div>
 
-      <div className="fixed left-0 top-0 z-30 px-2 pt-3">
+      <div className="fixed left-0 top-4 z-30 px-2">
         <Button
           variant="secondary"
           size="sm"
@@ -311,7 +270,7 @@ export default function App() {
           {showSessionComplete ? "Restart" : isRunning ? "Pause" : "Resume"}
         </Button>
       </div>
-      <div className="fixed left-1/2 top-0 z-30 -translate-x-1/2 px-2 pt-3">
+      <div className="fixed left-1/2 top-4 z-30 -translate-x-1/2 px-2">
         <Button
           variant="ghost"
           size="sm"
@@ -349,17 +308,6 @@ export default function App() {
           )}
         </Button>
       </div>
-      <div className="fixed right-0 top-0 z-20 px-2 pt-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowSettings(true)}
-          className="px-6 py-2 rounded-full border border-white/20 text-white/80 hover:border-white/40 hover:bg-white/5 h-auto"
-        >
-          Edit Pattern
-        </Button>
-      </div>
-
       {showSessionComplete && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/70 backdrop-blur-sm">
           <div className="flex max-w-xs flex-col items-center gap-4 rounded-2xl border border-white/10 bg-black/80 px-6 py-6 text-center text-white shadow-xl">
@@ -378,70 +326,6 @@ export default function App() {
         </div>
       )}
 
-      <Sheet open={showSettings} onOpenChange={setShowSettings}>
-        <SheetContent
-          side="right"
-          className="!top-0 !bottom-auto !right-0 !h-auto !inset-y-auto max-h-[50vh] w-[min(90vw,320px)] rounded-2xl border border-white/10 bg-black/90 text-white backdrop-blur-xl"
-        >
-          <SheetHeader>
-            <SheetTitle className="text-sm font-semibold tracking-[0.08em] text-white/70 uppercase">
-              Edit Breath Pattern
-            </SheetTitle>
-            <SheetDescription className="text-white/60">
-              Tune the tempo for {currentPattern?.name ?? "your practice"}.
-            </SheetDescription>
-          </SheetHeader>
-          <div className="space-y-4 px-4 pb-4">
-            {phases.map((phase) => (
-              <div key={phase.key} className="space-y-3">
-                <div className="flex items-center justify-between gap-4 text-sm text-white">
-                  <span className="text-white/90">{phase.label}</span>
-                  <div className="flex items-center gap-3 text-white/50">
-                    <Input
-                      type="number"
-                      inputMode="numeric"
-                      min={0}
-                      max={12}
-                      step={1}
-                      value={currentDurations[phase.key]}
-                      onChange={(event) =>
-                        handleDurationInput(phase.key, event.target.value)
-                      }
-                      className="h-7 w-12 rounded-md border-white/10 bg-white/3 px-2 text-right text-xs text-white/80 shadow-none"
-                      aria-label={`${phase.label} seconds`}
-                    />
-                    <span>seconds</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <SheetFooter className="flex-row items-center justify-between border-t border-white/10">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                if (!currentPattern) return;
-                setPatternDurations((prev) => ({
-                  ...prev,
-                  [currentPattern.id]: { ...defaultDurationsById[currentPattern.id] },
-                }));
-              }}
-              className="text-white/70 hover:text-white"
-            >
-              Reset defaults
-            </Button>
-            <SheetClose asChild>
-              <Button
-                size="sm"
-                className="rounded-full bg-white text-black hover:bg-white/90"
-              >
-                Done
-              </Button>
-            </SheetClose>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
     </div>
   );
 }
