@@ -260,7 +260,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center relative">
       {/* Main layout container with shader */}
       <div className="relative flex flex-col items-center justify-center">
         {/* Shader Circle */}
@@ -293,7 +293,9 @@ export default function App() {
           </motion.div>
         </motion.div>
 
-      <div className="fixed left-4 top-4 z-20">
+      </div>
+
+      <div className="fixed left-0 top-0 z-30 px-2 pt-3">
         <Button
           variant="secondary"
           size="sm"
@@ -309,10 +311,7 @@ export default function App() {
           {showSessionComplete ? "Restart" : isRunning ? "Pause" : "Resume"}
         </Button>
       </div>
-      <div className="fixed left-4 top-4 z-30">
-        <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/60">
-          {currentPattern?.name ?? "Breathwork"}
-        </div>
+      <div className="fixed left-1/2 top-0 z-30 -translate-x-1/2 px-2 pt-3">
         <Button
           variant="ghost"
           size="sm"
@@ -350,7 +349,7 @@ export default function App() {
           )}
         </Button>
       </div>
-      <div className="fixed right-4 top-4 z-20">
+      <div className="fixed right-0 top-0 z-20 px-2 pt-3">
         <Button
           variant="ghost"
           size="sm"
@@ -359,7 +358,6 @@ export default function App() {
         >
           Edit Pattern
         </Button>
-      </div>
       </div>
 
       {showSessionComplete && (
@@ -383,7 +381,7 @@ export default function App() {
       <Sheet open={showSettings} onOpenChange={setShowSettings}>
         <SheetContent
           side="right"
-          className="top-4 bottom-auto right-4 h-auto max-h-[50vh] w-[min(90vw,320px)] rounded-2xl border border-white/10 bg-black/90 text-white backdrop-blur-xl"
+          className="!top-0 !bottom-auto !right-0 !h-auto !inset-y-auto max-h-[50vh] w-[min(90vw,320px)] rounded-2xl border border-white/10 bg-black/90 text-white backdrop-blur-xl"
         >
           <SheetHeader>
             <SheetTitle className="text-sm font-semibold tracking-[0.08em] text-white/70 uppercase">
