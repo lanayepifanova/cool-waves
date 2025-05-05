@@ -7,6 +7,7 @@ interface ShaderCanvasProps {
   hasActiveReminders?: boolean;
   hasUpcomingReminders?: boolean;
   shaderId?: number;
+  timeScale?: number;
 }
 
 export const ShaderCanvas = ({ 
@@ -14,7 +15,8 @@ export const ShaderCanvas = ({
   onClick, 
   hasActiveReminders = false,
   hasUpcomingReminders = false,
-  shaderId = 1
+  shaderId = 1,
+  timeScale = 0.2,
 }: ShaderCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>(0);
@@ -80,7 +82,7 @@ export const ShaderCanvas = ({
 
     // Render function
     const render = () => {
-      const currentTime = (Date.now() - startTime) / 1000;
+      const currentTime = ((Date.now() - startTime) / 1000) * timeScale;
       
       // Get the current mouse position from ref
       const mousePos = mousePositionRef.current;
@@ -109,7 +111,14 @@ export const ShaderCanvas = ({
       }
     };
     // mousePositionRef is no longer in the dependency array
-  }, [size, hasActiveReminders, hasUpcomingReminders, shaderId, selectedShader.fragmentShader]);
+  }, [
+    size,
+    hasActiveReminders,
+    hasUpcomingReminders,
+    shaderId,
+    selectedShader.fragmentShader,
+    timeScale,
+  ]);
 
   // Initialize shader program
   function initShaderProgram(gl: WebGLRenderingContext, vsSource: string, fsSource: string) {

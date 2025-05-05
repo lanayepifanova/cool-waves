@@ -4,6 +4,7 @@ import { CenterBreathDisplay } from "./components/CenterBreathDisplay";
 import { motion } from "framer-motion";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
+import { Slider } from "./components/ui/slider";
 import "./styles/sonner-fixes.css";
 import "./styles/input-fixes.css";
 
@@ -66,6 +67,7 @@ export default function App() {
   const [showSessionComplete, setShowSessionComplete] = useState(false);
   const [isEditingSession, setIsEditingSession] = useState(false);
   const [sessionDraft, setSessionDraft] = useState(String(sessionMinutes));
+  const [shaderSpeed, setShaderSpeed] = useState(0.2);
 
   const currentPattern = breathPatterns.find(
     (pattern) => pattern.id === selectedPatternId,
@@ -241,6 +243,7 @@ export default function App() {
               hasActiveReminders={false}
               hasUpcomingReminders={false}
               shaderId={phaseShaderId}
+              timeScale={shaderSpeed}
             />
 
             <CenterBreathDisplay
@@ -271,42 +274,56 @@ export default function App() {
         </Button>
       </div>
       <div className="fixed left-1/2 top-4 z-30 -translate-x-1/2 px-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsEditingSession(true)}
-          className="h-auto rounded-full border border-white/15 bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70 hover:bg-black/70"
-        >
-          {isEditingSession ? (
-            <span className="flex items-center gap-2">
-              <span>Session</span>
-              <Input
-                type="number"
-                inputMode="numeric"
-                min={1}
-                max={60}
-                value={sessionDraft}
-                onChange={(event) => setSessionDraft(event.target.value)}
-                onBlur={commitSessionDraft}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    commitSessionDraft();
-                  }
-                  if (event.key === "Escape") {
-                    setSessionDraft(String(sessionMinutes));
-                    setIsEditingSession(false);
-                  }
-                }}
-                className="h-6 w-12 rounded-md border-white/20 bg-white/10 px-2 text-center text-[10px] text-white"
-                autoFocus
-                aria-label="Session minutes"
-              />
-              <span>min</span>
-            </span>
-          ) : (
-            <>Session · {formatSessionTime(sessionRemainingMs)}</>
-          )}
-        </Button>
+        <div className="flex flex-col items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsEditingSession(true)}
+            className="h-auto rounded-full border border-white/15 bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70 hover:bg-black/70"
+          >
+            {isEditingSession ? (
+              <span className="flex items-center gap-2">
+                <span>Session</span>
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  max={60}
+                  value={sessionDraft}
+                  onChange={(event) => setSessionDraft(event.target.value)}
+                  onBlur={commitSessionDraft}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      commitSessionDraft();
+                    }
+                    if (event.key === "Escape") {
+                      setSessionDraft(String(sessionMinutes));
+                      setIsEditingSession(false);
+                    }
+                  }}
+                  className="h-6 w-12 rounded-md border-white/20 bg-white/10 px-2 text-center text-[10px] text-white"
+                  autoFocus
+                  aria-label="Session minutes"
+                />
+                <span>min</span>
+              </span>
+            ) : (
+              <>Session · {formatSessionTime(sessionRemainingMs)}</>
+            )}
+          </Button>
+          <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/60 px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/60">
+            <span>Speed</span>
+            <Slider
+              value={[shaderSpeed]}
+              min={0.1}
+              max={1}
+              step={0.05}
+              onValueChange={(value) => setShaderSpeed(value[0])}
+              className="w-20 [&_[data-slot=slider-track]]:h-1.5 [&_[data-slot=slider-track]]:bg-white/10 [&_[data-slot=slider-range]]:bg-white/70 [&_[data-slot=slider-thumb]]:size-3 [&_[data-slot=slider-thumb]]:border-white/50 [&_[data-slot=slider-thumb]]:bg-white"
+            />
+            <span>{Math.round(shaderSpeed * 100)}%</span>
+          </div>
+        </div>
       </div>
       {showSessionComplete && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/70 backdrop-blur-sm">
