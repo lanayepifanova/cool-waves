@@ -3,8 +3,6 @@ import { ShaderCanvas } from "./components/ShaderCanvas";
 import { CenterBreathDisplay } from "./components/CenterBreathDisplay";
 import { motion } from "framer-motion";
 import { Button } from "./components/ui/button";
-import { Input } from "./components/ui/input";
-import { Slider } from "./components/ui/slider";
 import "./styles/sonner-fixes.css";
 import "./styles/input-fixes.css";
 
@@ -65,9 +63,8 @@ export default function App() {
   const [sessionMinutes, setSessionMinutes] = useState(5);
   const [sessionRemainingMs, setSessionRemainingMs] = useState(sessionMinutes * 60 * 1000);
   const [showSessionComplete, setShowSessionComplete] = useState(false);
-  const [isEditingSession, setIsEditingSession] = useState(false);
-  const [sessionDraft, setSessionDraft] = useState(String(sessionMinutes));
-  const [shaderSpeed, setShaderSpeed] = useState(0.2);
+  const shaderSpeed = 0.2;
+  const [showSettings, setShowSettings] = useState(false);
 
   const currentPattern = breathPatterns.find(
     (pattern) => pattern.id === selectedPatternId,
@@ -137,18 +134,6 @@ export default function App() {
     setPhaseIndex(0);
     setPhaseTimeLeftMs(phases[0].duration * 1000);
   };
-  const commitSessionDraft = () => {
-    const parsed = Number(sessionDraft);
-    if (!Number.isFinite(parsed)) {
-      setSessionDraft(String(sessionMinutes));
-      setIsEditingSession(false);
-      return;
-    }
-    const clamped = Math.max(1, Math.min(60, Math.round(parsed)));
-    setSessionDraft(String(clamped));
-    setIsEditingSession(false);
-    startSession(clamped);
-  };
 
   // Set dark mode
   useEffect(() => {
@@ -186,11 +171,6 @@ export default function App() {
     setPhaseIndex(0);
     setPhaseTimeLeftMs(phases[0].duration * 1000);
   }, [phases]);
-  useEffect(() => {
-    if (!isEditingSession) {
-      setSessionDraft(String(sessionMinutes));
-    }
-  }, [isEditingSession, sessionMinutes]);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -257,72 +237,31 @@ export default function App() {
 
       </div>
 
-      <div className="fixed left-0 top-4 z-30 px-2">
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => {
-            if (showSessionComplete || sessionRemainingMs <= 0) {
-              startSession(sessionMinutes);
-              return;
-            }
-            setIsRunning((prev) => !prev);
-          }}
-          className="px-6 py-2 bg-secondary/30 backdrop-blur-sm hover:bg-secondary/50 rounded-full h-auto"
-        >
-          {showSessionComplete ? "Restart" : isRunning ? "Pause" : "Resume"}
-        </Button>
-      </div>
       <div className="fixed left-1/2 top-4 z-30 -translate-x-1/2 px-2">
-        <div className="flex flex-col items-center gap-2">
+        <div className="rounded-full border border-white/15 bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70">
+          Session · {formatSessionTime(sessionRemainingMs)}
+        </div>
+      </div>
+      <div className="fixed right-0 top-4 z-20 px-3">
+        <div className="relative flex flex-col items-end gap-2">
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setIsEditingSession(true)}
-            className="h-auto rounded-full border border-white/15 bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70 hover:bg-black/70"
+            onClick={() => setShowSettings((prev) => !prev)}
+            className="h-auto rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/90 shadow-[0_0_0_1px_rgba(255,255,255,0.06)] hover:bg-white/15"
           >
-            {isEditingSession ? (
-              <span className="flex items-center gap-2">
-                <span>Session</span>
-                <Input
-                  type="number"
-                  inputMode="numeric"
-                  min={1}
-                  max={60}
-                  value={sessionDraft}
-                  onChange={(event) => setSessionDraft(event.target.value)}
-                  onBlur={commitSessionDraft}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      commitSessionDraft();
-                    }
-                    if (event.key === "Escape") {
-                      setSessionDraft(String(sessionMinutes));
-                      setIsEditingSession(false);
-                    }
-                  }}
-                  className="h-6 w-12 rounded-md border-white/20 bg-white/10 px-2 text-center text-[10px] text-white"
-                  autoFocus
-                  aria-label="Session minutes"
-                />
-                <span>min</span>
-              </span>
-            ) : (
-              <>Session · {formatSessionTime(sessionRemainingMs)}</>
-            )}
+            Settings
           </Button>
-          <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/60 px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-white/60">
-            <span>Speed</span>
-            <Slider
-              value={[shaderSpeed]}
-              min={0.1}
-              max={1}
-              step={0.05}
-              onValueChange={(value) => setShaderSpeed(value[0])}
-              className="w-20 [&_[data-slot=slider-track]]:h-1.5 [&_[data-slot=slider-track]]:bg-white/10 [&_[data-slot=slider-range]]:bg-white/70 [&_[data-slot=slider-thumb]]:size-3 [&_[data-slot=slider-thumb]]:border-white/50 [&_[data-slot=slider-thumb]]:bg-white"
-            />
-            <span>{Math.round(shaderSpeed * 100)}%</span>
-          </div>
+          {showSettings && (
+            <div className="absolute right-0 top-11 w-64 rounded-2xl border border-white/10 bg-black/85 p-6 text-white shadow-xl backdrop-blur-sm">
+              <div className="text-[9px] font-light uppercase tracking-[0.3em] text-white/60">
+                Session
+              </div>
+              <div className="mt-8 text-[9px] font-light uppercase tracking-[0.3em] text-white/55">
+                Speed
+              </div>
+            </div>
+          )}
         </div>
       </div>
       {showSessionComplete && (
