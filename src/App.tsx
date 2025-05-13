@@ -235,6 +235,19 @@ export default function App() {
   const timeLeftSeconds = Math.max(0, Math.ceil(phaseTimeLeftMs / 1000));
   const phaseScale = phaseScaleTargets[currentPhase.key];
   const phaseShaderId = phaseShaderTargets[currentPhase.key];
+  const phaseDurationMs = Math.max(0, currentPhase.duration * 1000);
+  const phaseProgress =
+    phaseDurationMs > 0 ? 1 - phaseTimeLeftMs / phaseDurationMs : 0;
+  const sessionDurationMs = Math.max(1, sessionDurationSeconds * 1000);
+  const sessionProgress = 1 - sessionRemainingMs / sessionDurationMs;
+  const clampedPhaseProgress = Math.min(1, Math.max(0, phaseProgress));
+  const clampedSessionProgress = Math.min(1, Math.max(0, sessionProgress));
+  const ringSize = canvasSize * 1.08;
+  const ringStroke = Math.max(4, canvasSize * 0.012);
+  const outerRadius = ringSize / 2 - ringStroke / 2;
+  const innerRadius = outerRadius - ringStroke * 1.6;
+  const outerCircumference = 2 * Math.PI * outerRadius;
+  const innerCircumference = 2 * Math.PI * innerRadius;
   if (showSettings) {
     return <SettingsPage onClose={() => setShowSettings(false)} />;
   }
@@ -254,6 +267,53 @@ export default function App() {
             transition={phaseTransition}
             className="app-canvas-wrap"
           >
+            <div className="app-progress-ring" aria-hidden="true">
+              <svg
+                className="app-progress-svg"
+                width={ringSize}
+                height={ringSize}
+                viewBox={`0 0 ${ringSize} ${ringSize}`}
+              >
+                <g transform={`rotate(-90 ${ringSize / 2} ${ringSize / 2})`}>
+                  <circle
+                    className="app-progress-track"
+                    cx={ringSize / 2}
+                    cy={ringSize / 2}
+                    r={outerRadius}
+                    strokeWidth={ringStroke}
+                  />
+                  <circle
+                    className="app-progress-session"
+                    cx={ringSize / 2}
+                    cy={ringSize / 2}
+                    r={outerRadius}
+                    strokeWidth={ringStroke}
+                    strokeDasharray={outerCircumference}
+                    strokeDashoffset={
+                      outerCircumference * (1 - clampedSessionProgress)
+                    }
+                  />
+                  <circle
+                    className="app-progress-track"
+                    cx={ringSize / 2}
+                    cy={ringSize / 2}
+                    r={innerRadius}
+                    strokeWidth={ringStroke * 0.75}
+                  />
+                  <circle
+                    className="app-progress-phase"
+                    cx={ringSize / 2}
+                    cy={ringSize / 2}
+                    r={innerRadius}
+                    strokeWidth={ringStroke * 0.75}
+                    strokeDasharray={innerCircumference}
+                    strokeDashoffset={
+                      innerCircumference * (1 - clampedPhaseProgress)
+                    }
+                  />
+                </g>
+              </svg>
+            </div>
             <ShaderCanvas
               size={canvasSize}
               onClick={toggleSessionRunning}

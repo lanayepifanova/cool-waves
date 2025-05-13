@@ -59,6 +59,43 @@ input:focus-visible {
   position: relative;
 }
 
+.app-canvas-wrap {
+  overflow: visible;
+}
+
+.app-progress-ring {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.app-progress-svg {
+  overflow: visible;
+}
+
+.app-progress-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+}
+
+.app-progress-session {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 120ms linear;
+}
+
+.app-progress-phase {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 120ms linear;
+}
+
 .shader-canvas {
   border-radius: 999px;
   transition: transform 0.3s ease;
