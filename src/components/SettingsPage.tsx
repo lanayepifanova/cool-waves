@@ -1,10 +1,10 @@
 import { useState, type ReactNode } from "react";
-import { ArrowLeft, ChevronDown, Clock, Wind, Zap } from "lucide-react";
+import { ArrowLeft, ChevronDown } from "lucide-react";
 
 interface SettingSection {
   id: string;
   title: string;
-  icon: ReactNode;
+  icon: ReactNode | null;
   description?: string;
 }
 
@@ -17,8 +17,7 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
     new Set(["session", "breathing", "animation"]),
   );
 
-  const [sessionDuration, setSessionDuration] = useState(10);
-  const [sessionOptions] = useState([5, 10, 15, 20, 30, 45, 60]);
+  const [sessionDurationSeconds, setSessionDurationSeconds] = useState(600);
   const [breathing, setBreathing] = useState({
     inhale: 4,
     hold: 4,
@@ -44,30 +43,33 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
     }));
   };
 
+  const formatDuration = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
   const sections: SettingSection[] = [
     {
       id: "session",
       title: "Session Duration",
-      icon: <Clock size={20} />,
+      icon: null,
       description: "Set your meditation session length",
     },
     {
       id: "breathing",
       title: "Breathing Pattern",
-      icon: <Wind size={20} />,
+      icon: null,
       description: "Customize your breathing rhythm",
     },
     {
       id: "animation",
       title: "Animation Speed",
-      icon: <Zap size={20} />,
+      icon: null,
       description: "Adjust background animation pace",
     },
   ];
 
-  const totalBreathCycle =
-    breathing.inhale + breathing.hold + breathing.exhale + breathing.rest;
-  const breathsPerMinute = Math.round((60 / totalBreathCycle) * 10) / 10;
 
   return (
     <div className="settings-page">
@@ -94,7 +96,6 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
                 className="settings-card-toggle"
               >
                 <div className="settings-card-title-wrap">
-                  <div className="settings-card-icon">{section.icon}</div>
                   <div className="settings-card-text">
                     <h2 className="settings-card-title">{section.title}</h2>
                     {section.description && (
@@ -117,58 +118,61 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
                         <div className="settings-row">
                           <label className="settings-label">Session Duration</label>
                           <span className="settings-value">
-                            {sessionDuration} min
+                            {formatDuration(sessionDurationSeconds)}
                           </span>
                         </div>
                         <input
                           type="range"
                           className="settings-slider"
-                          value={sessionDuration}
+                          value={sessionDurationSeconds}
                           onChange={(event) =>
-                            setSessionDuration(Number(event.target.value))
+                            setSessionDurationSeconds(Number(event.target.value))
                           }
-                          min={5}
-                          max={60}
-                          step={5}
+                          min={0}
+                          max={600}
+                          step={15}
                         />
-                      </div>
-
-                      <div className="settings-block">
-                        <p className="settings-helper">Quick Select</p>
-                        <div className="settings-grid settings-grid-4">
-                          {sessionOptions.map((option) => (
-                            <button
-                              key={option}
-                              onClick={() => setSessionDuration(option)}
-                              className={`settings-pill ${
-                                sessionDuration === option ? "is-active" : ""
-                              }`}
-                            >
-                              {option}m
-                            </button>
-                          ))}
-                        </div>
                       </div>
                     </div>
                   )}
 
                   {section.id === "breathing" && (
                     <div className="settings-stack">
-                      <div className="settings-info-card">
-                        <p className="settings-helper">Breath Cycle Information</p>
-                        <div className="settings-info">
-                          <p>
-                            Total cycle:{" "}
-                            <span className="settings-info-value">
-                              {totalBreathCycle}s
-                            </span>
-                          </p>
-                          <p>
-                            Breaths per minute:{" "}
-                            <span className="settings-info-value">
-                              {breathsPerMinute}
-                            </span>
-                          </p>
+                      <div className="settings-block">
+                        <p className="settings-helper">Preset Patterns</p>
+                        <div className="settings-grid settings-grid-2">
+                          <button
+                            onClick={() =>
+                              setBreathing({ inhale: 4, hold: 4, exhale: 4, rest: 2 })
+                            }
+                            className="settings-pill"
+                          >
+                            Box Breathing
+                          </button>
+                          <button
+                            onClick={() =>
+                              setBreathing({ inhale: 4, hold: 7, exhale: 8, rest: 0 })
+                            }
+                            className="settings-pill"
+                          >
+                            4-7-8 Breathing
+                          </button>
+                          <button
+                            onClick={() =>
+                              setBreathing({ inhale: 5, hold: 0, exhale: 5, rest: 0 })
+                            }
+                            className="settings-pill"
+                          >
+                            Equal Breathing
+                          </button>
+                          <button
+                            onClick={() =>
+                              setBreathing({ inhale: 3, hold: 0, exhale: 6, rest: 0 })
+                            }
+                            className="settings-pill"
+                          >
+                            Relaxing Breath
+                          </button>
                         </div>
                       </div>
 
@@ -325,44 +329,6 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
                           />
                         </div>
                       </div>
-
-                      <div className="settings-block">
-                        <p className="settings-helper">Preset Patterns</p>
-                        <div className="settings-grid settings-grid-2">
-                          <button
-                            onClick={() =>
-                              setBreathing({ inhale: 4, hold: 4, exhale: 4, rest: 2 })
-                            }
-                            className="settings-pill"
-                          >
-                            Box Breathing
-                          </button>
-                          <button
-                            onClick={() =>
-                              setBreathing({ inhale: 4, hold: 7, exhale: 8, rest: 0 })
-                            }
-                            className="settings-pill"
-                          >
-                            4-7-8 Breathing
-                          </button>
-                          <button
-                            onClick={() =>
-                              setBreathing({ inhale: 5, hold: 0, exhale: 5, rest: 0 })
-                            }
-                            className="settings-pill"
-                          >
-                            Equal Breathing
-                          </button>
-                          <button
-                            onClick={() =>
-                              setBreathing({ inhale: 3, hold: 0, exhale: 6, rest: 0 })
-                            }
-                            className="settings-pill"
-                          >
-                            Relaxing Breath
-                          </button>
-                        </div>
-                      </div>
                     </div>
                   )}
 
@@ -389,18 +355,6 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
                         <div className="settings-scale">
                           <span>Slower</span>
                           <span>Faster</span>
-                        </div>
-                      </div>
-
-                      <div className="settings-preview-card">
-                        <p className="settings-helper">Preview</p>
-                        <div className="settings-preview">
-                          <div
-                            className="settings-spinner"
-                            style={{
-                              animation: `spin ${4 / animationSpeed}s linear infinite`,
-                            }}
-                          />
                         </div>
                       </div>
                     </div>
