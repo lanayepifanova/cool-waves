@@ -254,7 +254,7 @@ export default function App() {
             Settings
           </Button>
           {showSettings && (
-            <div className="absolute right-0 top-11 w-64 rounded-2xl border border-white/10 bg-black/85 p-6 text-white shadow-xl backdrop-blur-sm">
+            <div className="absolute right-0 top-11 w-80 rounded-2xl border border-white/10 bg-black/85 p-8 text-white shadow-xl backdrop-blur-sm">
               <div className="text-[9px] font-light uppercase tracking-[0.3em] text-white/60">
                 Session
               </div>
@@ -262,7 +262,7 @@ export default function App() {
               <div className="text-[9px] font-light uppercase tracking-[0.3em] text-white/55">
                 Speed
               </div>
-              <div className="mt-8 flex flex-col gap-6">
+              <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-5">
                 <Slider
                   value={[shaderSpeed]}
                   min={0.1}
@@ -270,10 +270,10 @@ export default function App() {
                   step={0.05}
                   orientation="horizontal"
                   onValueChange={(value) => setShaderSpeed(value[0])}
-                  className="w-52 [&_[data-slot=slider-track]]:h-2 [&_[data-slot=slider-track]]:bg-white/25 [&_[data-slot=slider-range]]:bg-white/80 [&_[data-slot=slider-thumb]]:size-3.5 [&_[data-slot=slider-thumb]]:border-white/70 [&_[data-slot=slider-thumb]]:bg-white"
+                  className="w-full [&_[data-slot=slider-track]]:h-2 [&_[data-slot=slider-track]]:bg-white/25 [&_[data-slot=slider-range]]:bg-white/80 [&_[data-slot=slider-thumb]]:size-3.5 [&_[data-slot=slider-thumb]]:border-white/70 [&_[data-slot=slider-thumb]]:bg-white"
                   aria-label="Animation speed"
                 />
-                <div className="text-right text-[9px] font-light uppercase tracking-[0.24em] text-white/50">
+                <div className="mt-6 text-right text-[9px] font-light uppercase tracking-[0.24em] text-white/50">
                   {Math.round(shaderSpeed * 100)}%
                 </div>
               </div>
