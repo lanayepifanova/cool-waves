@@ -204,83 +204,158 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center relative">
-      {/* Main layout container with shader */}
-      <div className="relative flex flex-col items-center justify-center">
-        {/* Shader Circle */}
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="relative"
-        >
-          <motion.div
-            initial={{ scale: smallScale }}
-            animate={{ scale: phaseScale }}
-            transition={phaseTransition}
-            className="relative"
-          >
-            <ShaderCanvas
-              size={canvasSize}
-              hasActiveReminders={false}
-              hasUpcomingReminders={false}
-              shaderId={phaseShaderId}
-              timeScale={shaderSpeed}
-            />
-
-            <CenterBreathDisplay
-              size={canvasSize}
-              phaseLabel={currentPhase.label}
-              timeLeftSeconds={timeLeftSeconds}
-              patternName={currentPattern?.name ?? "Breathwork"}
-            />
-          </motion.div>
-        </motion.div>
-
-      </div>
-
-      <div className="fixed left-1/2 top-4 z-30 -translate-x-1/2 px-2">
-        <div className="rounded-full border border-white/15 bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70">
-          Session · {formatSessionTime(sessionRemainingMs)}
-        </div>
-      </div>
-      <div className="fixed right-0 top-4 z-20 px-3">
-        <div className="relative flex flex-col items-end gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowSettings((prev) => !prev)}
-            className="h-auto rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/90 shadow-[0_0_0_1px_rgba(255,255,255,0.06)] hover:bg-white/15"
-          >
-            Settings
-          </Button>
-          {showSettings && (
-            <div className="absolute right-0 top-11 w-80 rounded-2xl border border-white/10 bg-black/85 p-8 text-white shadow-xl backdrop-blur-sm">
-              <div className="text-[9px] font-light uppercase tracking-[0.3em] text-white/60">
-                Session
-              </div>
-              <div className="mt-12 h-8" />
-              <div className="text-[9px] font-light uppercase tracking-[0.3em] text-white/55">
-                Speed
-              </div>
-              <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-5">
-                <Slider
-                  value={[shaderSpeed]}
-                  min={0.1}
-                  max={1}
-                  step={0.05}
-                  orientation="horizontal"
-                  onValueChange={(value) => setShaderSpeed(value[0])}
-                  className="w-full [&_[data-slot=slider-track]]:h-2 [&_[data-slot=slider-track]]:bg-white/25 [&_[data-slot=slider-range]]:bg-white/80 [&_[data-slot=slider-thumb]]:size-3.5 [&_[data-slot=slider-thumb]]:border-white/70 [&_[data-slot=slider-thumb]]:bg-white"
-                  aria-label="Animation speed"
+      {!showSettings && (
+        <>
+          <div className="relative flex flex-col items-center justify-center">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="relative"
+            >
+              <motion.div
+                initial={{ scale: smallScale }}
+                animate={{ scale: phaseScale }}
+                transition={phaseTransition}
+                className="relative"
+              >
+                <ShaderCanvas
+                  size={canvasSize}
+                  hasActiveReminders={false}
+                  hasUpcomingReminders={false}
+                  shaderId={phaseShaderId}
+                  timeScale={shaderSpeed}
                 />
-                <div className="mt-6 text-right text-[9px] font-light uppercase tracking-[0.24em] text-white/50">
-                  {Math.round(shaderSpeed * 100)}%
+
+                <CenterBreathDisplay
+                  size={canvasSize}
+                  phaseLabel={currentPhase.label}
+                  timeLeftSeconds={timeLeftSeconds}
+                  patternName={currentPattern?.name ?? "Breathwork"}
+                />
+              </motion.div>
+            </motion.div>
+          </div>
+
+          <div className="fixed left-1/2 top-4 z-30 -translate-x-1/2 px-2">
+            <div className="rounded-full border border-white/15 bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70">
+              Session · {formatSessionTime(sessionRemainingMs)}
+            </div>
+          </div>
+          <div className="fixed right-0 top-4 z-20 px-3">
+            <div className="relative flex flex-col items-end gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowSettings(true)}
+                className="h-7 rounded-full border border-white/20 bg-white/10 px-3 text-[9px] font-semibold uppercase tracking-[0.26em] text-white/85 shadow-[0_0_0_1px_rgba(255,255,255,0.06)] hover:bg-white/15"
+              >
+                Settings
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
+      {showSettings && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/90 px-4 py-10">
+          <div className="w-full max-w-4xl rounded-[36px] border border-white/15 bg-gradient-to-br from-white/12 via-black/85 to-black/95 p-12 text-white shadow-[0_40px_100px_rgba(0,0,0,0.65)] backdrop-blur">
+            <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-[0.32em] text-white/60">
+                  Settings
+                </div>
+                <div className="mt-5 text-4xl font-semibold text-white/95">
+                  Focused session setup
+                </div>
+                <div className="mt-4 max-w-xl text-sm leading-relaxed text-white/60">
+                  Step away from the visuals. Choose a duration and pace that feels right,
+                  then return to the breath.
                 </div>
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-11 rounded-full border border-white/15 bg-white/5 px-6 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/70 hover:bg-white/10"
+                onClick={() => setShowSettings(false)}
+                aria-label="Close settings"
+              >
+                Done
+              </Button>
             </div>
-          )}
+
+            <div className="mt-12 grid gap-10">
+              <div className="rounded-[26px] border border-white/10 bg-white/5 p-8">
+                <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.26em] text-white/60">
+                  <span>Session length</span>
+                  <span className="text-white/80">{sessionMinutes} min</span>
+                </div>
+                <div className="mt-8">
+                  <Slider
+                    value={[sessionMinutes]}
+                    min={2}
+                    max={30}
+                    step={1}
+                    orientation="horizontal"
+                    onValueChange={(value) => {
+                      setSessionMinutes(value[0]);
+                      setSessionRemainingMs(value[0] * 60 * 1000);
+                    }}
+                    className="w-full [&_[data-slot=slider-track]]:h-3 [&_[data-slot=slider-track]]:bg-white/20 [&_[data-slot=slider-range]]:bg-white/85 [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border-white/70 [&_[data-slot=slider-thumb]]:bg-white"
+                    aria-label="Session length in minutes"
+                  />
+                </div>
+                <div className="mt-8 flex flex-wrap gap-4">
+                  {[3, 5, 10, 15, 20].map((minutes) => (
+                    <Button
+                      key={minutes}
+                      variant="outline"
+                      size="sm"
+                      className={
+                        minutes === sessionMinutes
+                          ? "h-9 rounded-full border-white/50 bg-white/20 px-5 text-[10px] font-semibold uppercase tracking-[0.22em] text-white"
+                          : "h-9 rounded-full border-white/15 bg-white/5 px-5 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/70 hover:bg-white/10"
+                      }
+                      onClick={() => {
+                        setSessionMinutes(minutes);
+                        setSessionRemainingMs(minutes * 60 * 1000);
+                      }}
+                    >
+                      {minutes}m
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-[26px] border border-white/10 bg-white/5 p-8">
+                <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.26em] text-white/60">
+                  <span>Animation speed</span>
+                  <span className="text-white/80">{Math.round(shaderSpeed * 100)}%</span>
+                </div>
+                <div className="mt-8">
+                  <Slider
+                    value={[shaderSpeed]}
+                    min={0.1}
+                    max={1}
+                    step={0.05}
+                    orientation="horizontal"
+                    onValueChange={(value) => setShaderSpeed(value[0])}
+                    className="w-full [&_[data-slot=slider-track]]:h-3 [&_[data-slot=slider-track]]:bg-white/20 [&_[data-slot=slider-range]]:bg-white/85 [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border-white/70 [&_[data-slot=slider-thumb]]:bg-white"
+                    aria-label="Animation speed"
+                  />
+                </div>
+              </div>
+
+              <Button
+                size="sm"
+                className="h-12 w-full rounded-full bg-white text-[11px] font-semibold uppercase tracking-[0.22em] text-black hover:bg-white/90"
+                onClick={() => startSession(sessionMinutes)}
+              >
+                Restart session
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
       {showSessionComplete && (
         <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/70 backdrop-blur-sm">
           <div className="flex max-w-xs flex-col items-center gap-4 rounded-2xl border border-white/10 bg-black/80 px-6 py-6 text-center text-white shadow-xl">
