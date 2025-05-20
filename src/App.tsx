@@ -15,6 +15,28 @@ interface BreathPattern {
   note: string;
 }
 
+const SETTINGS_STORAGE_KEY = "meditationSettings";
+const DEFAULT_SETTINGS = {
+  sessionDurationSeconds: 600,
+  breathing: {
+    inhale: 4,
+    hold: 4,
+    exhale: 4,
+    rest: 2,
+  },
+  animationSpeed: 1,
+};
+
+const breathingLimits: Record<
+  BreathPhaseKey,
+  { min: number; max: number }
+> = {
+  inhale: { min: 1, max: 10 },
+  hold: { min: 1, max: 10 },
+  exhale: { min: 1, max: 10 },
+  rest: { min: 0, max: 5 },
+};
+
 const breathPatterns: BreathPattern[] = [
   {
     id: "box",
@@ -56,21 +78,36 @@ export default function App() {
   const [isRunning, setIsRunning] = useState(true);
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [phaseTimeLeftMs, setPhaseTimeLeftMs] = useState(
-    breathPatterns[0].durations.inhale * 1000,
+    DEFAULT_SETTINGS.breathing.inhale * 1000,
   );
-  const [sessionMinutes, setSessionMinutes] = useState(5);
-  const [sessionRemainingMs, setSessionRemainingMs] = useState(sessionMinutes * 60 * 1000);
+  const [sessionDurationSeconds, setSessionDurationSeconds] = useState(
+    DEFAULT_SETTINGS.sessionDurationSeconds,
+  );
+  const [sessionRemainingMs, setSessionRemainingMs] = useState(
+    DEFAULT_SETTINGS.sessionDurationSeconds * 1000,
+  );
   const [showSessionComplete, setShowSessionComplete] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const shaderSpeed = 0.2;
+  const [breathingDurations, setBreathingDurations] = useState(
+    DEFAULT_SETTINGS.breathing,
+  );
+  const [animationSpeed, setAnimationSpeed] = useState(
+    DEFAULT_SETTINGS.animationSpeed,
+  );
+  const [settingsSnapshot, setSettingsSnapshot] = useState<string | null>(null);
+  const shaderSpeed = 0.2 * animationSpeed;
 
   const currentPattern = breathPatterns.find(
     (pattern) => pattern.id === selectedPatternId,
   );
 
-  const currentDurations = currentPattern
-    ? currentPattern.durations
-    : breathPatterns[0].durations;
+  const currentDurations = breathingDurations;
+  const matchesPattern =
+    currentPattern &&
+    (Object.keys(currentPattern.durations) as BreathPhaseKey[]).every(
+      (key) => currentPattern.durations[key] === currentDurations[key],
+    );
+  const patternName = matchesPattern ? currentPattern?.name ?? "Breathwork" : "Custom";
 
   const phases = useMemo(
     () => [
@@ -124,9 +161,9 @@ export default function App() {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const startSession = (minutes: number) => {
-    setSessionMinutes(minutes);
-    setSessionRemainingMs(minutes * 60 * 1000);
+  const startSession = (durationSeconds: number) => {
+    setSessionDurationSeconds(durationSeconds);
+    setSessionRemainingMs(durationSeconds * 1000);
     setShowSessionComplete(false);
     setIsRunning(true);
     setPhaseIndex(0);
@@ -144,6 +181,82 @@ export default function App() {
       setSelectedPatternId(savedPattern);
     }
   }, []);
+
+  const applySettings = (settings: typeof DEFAULT_SETTINGS, snapshot: string | null) => {
+    const clamp = (key: BreathPhaseKey, value: number) => {
+      const limits = breathingLimits[key];
+      return Math.min(limits.max, Math.max(limits.min, value));
+    };
+    setSessionDurationSeconds(settings.sessionDurationSeconds);
+    setSessionRemainingMs(settings.sessionDurationSeconds * 1000);
+    setBreathingDurations({
+      inhale: clamp("inhale", settings.breathing.inhale),
+      hold: clamp("hold", settings.breathing.hold),
+      exhale: clamp("exhale", settings.breathing.exhale),
+      rest: clamp("rest", settings.breathing.rest),
+    });
+    setAnimationSpeed(settings.animationSpeed);
+    setShowSessionComplete(false);
+    setSettingsSnapshot(snapshot);
+  };
+
+  const readSettings = () => {
+    const storedSettings = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (!storedSettings) {
+      if (settingsSnapshot !== "__default__") {
+        applySettings(DEFAULT_SETTINGS, "__default__");
+      }
+      return;
+    }
+    if (storedSettings === settingsSnapshot) {
+      return;
+    }
+    try {
+      const parsed = JSON.parse(storedSettings) as Partial<typeof DEFAULT_SETTINGS>;
+      const normalized = {
+        sessionDurationSeconds:
+          typeof parsed.sessionDurationSeconds === "number"
+            ? parsed.sessionDurationSeconds
+            : DEFAULT_SETTINGS.sessionDurationSeconds,
+        breathing: {
+          inhale:
+            typeof parsed.breathing?.inhale === "number"
+              ? parsed.breathing.inhale
+              : DEFAULT_SETTINGS.breathing.inhale,
+          hold:
+            typeof parsed.breathing?.hold === "number"
+              ? parsed.breathing.hold
+              : DEFAULT_SETTINGS.breathing.hold,
+          exhale:
+            typeof parsed.breathing?.exhale === "number"
+              ? parsed.breathing.exhale
+              : DEFAULT_SETTINGS.breathing.exhale,
+          rest:
+            typeof parsed.breathing?.rest === "number"
+              ? parsed.breathing.rest
+              : DEFAULT_SETTINGS.breathing.rest,
+        },
+        animationSpeed:
+          typeof parsed.animationSpeed === "number"
+            ? parsed.animationSpeed
+            : DEFAULT_SETTINGS.animationSpeed,
+      };
+      applySettings(normalized, storedSettings);
+    } catch {
+      localStorage.removeItem(SETTINGS_STORAGE_KEY);
+      applySettings(DEFAULT_SETTINGS, "__default__");
+    }
+  };
+
+  useEffect(() => {
+    readSettings();
+  }, []);
+
+  useEffect(() => {
+    if (!showSettings) {
+      readSettings();
+    }
+  }, [showSettings]);
 
   useEffect(() => {
     localStorage.setItem("selectedPattern", selectedPatternId);
@@ -229,7 +342,7 @@ export default function App() {
               size={canvasSize}
               phaseLabel={currentPhase.label}
               timeLeftSeconds={timeLeftSeconds}
-              patternName={currentPattern?.name ?? "Breathwork"}
+              patternName={patternName}
             />
           </motion.div>
         </motion.div>
@@ -257,7 +370,7 @@ export default function App() {
             </div>
             <button
               className="app-primary-button"
-              onClick={() => startSession(sessionMinutes)}
+              onClick={() => startSession(sessionDurationSeconds)}
             >
               Start again
             </button>

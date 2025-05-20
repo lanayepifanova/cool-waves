@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 
 interface SettingSection {
@@ -12,19 +12,77 @@ type SettingsPageProps = {
   onClose: () => void;
 };
 
-export default function SettingsPage({ onClose }: SettingsPageProps) {
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(["session", "breathing", "animation"]),
-  );
-
-  const [sessionDurationSeconds, setSessionDurationSeconds] = useState(600);
-  const [breathing, setBreathing] = useState({
+const SETTINGS_STORAGE_KEY = "meditationSettings";
+const DEFAULT_SETTINGS = {
+  sessionDurationSeconds: 600,
+  breathing: {
     inhale: 4,
     hold: 4,
     exhale: 4,
     rest: 2,
-  });
-  const [animationSpeed, setAnimationSpeed] = useState(1);
+  },
+  animationSpeed: 1,
+};
+
+const breathingLimits: Record<
+  keyof typeof DEFAULT_SETTINGS.breathing,
+  { min: number; max: number }
+> = {
+  inhale: { min: 1, max: 10 },
+  hold: { min: 1, max: 10 },
+  exhale: { min: 1, max: 10 },
+  rest: { min: 0, max: 5 },
+};
+
+export default function SettingsPage({ onClose }: SettingsPageProps) {
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(["session", "breathing", "animation"]),
+  );
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saved">("idle");
+
+  const [sessionDurationSeconds, setSessionDurationSeconds] = useState(
+    DEFAULT_SETTINGS.sessionDurationSeconds,
+  );
+  const [breathing, setBreathing] = useState(DEFAULT_SETTINGS.breathing);
+  const [animationSpeed, setAnimationSpeed] = useState(
+    DEFAULT_SETTINGS.animationSpeed,
+  );
+
+  useEffect(() => {
+    const storedSettings = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (!storedSettings) return;
+    try {
+      const parsed = JSON.parse(storedSettings) as Partial<typeof DEFAULT_SETTINGS>;
+      if (typeof parsed.sessionDurationSeconds === "number") {
+        setSessionDurationSeconds(parsed.sessionDurationSeconds);
+      }
+      if (typeof parsed.animationSpeed === "number") {
+        setAnimationSpeed(parsed.animationSpeed);
+      }
+      if (parsed.breathing) {
+        setBreathing((prev) => ({
+          inhale:
+            typeof parsed.breathing?.inhale === "number"
+              ? parsed.breathing.inhale
+              : prev.inhale,
+          hold:
+            typeof parsed.breathing?.hold === "number"
+              ? parsed.breathing.hold
+              : prev.hold,
+          exhale:
+            typeof parsed.breathing?.exhale === "number"
+              ? parsed.breathing.exhale
+              : prev.exhale,
+          rest:
+            typeof parsed.breathing?.rest === "number"
+              ? parsed.breathing.rest
+              : prev.rest,
+        }));
+      }
+    } catch {
+      localStorage.removeItem(SETTINGS_STORAGE_KEY);
+    }
+  }, []);
 
   const toggleSection = (sectionId: string) => {
     const newExpanded = new Set(expandedSections);
@@ -37,9 +95,10 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
   };
 
   const updateBreathing = (key: keyof typeof breathing, value: number) => {
+    const limits = breathingLimits[key];
     setBreathing((prev) => ({
       ...prev,
-      [key]: Math.max(1, value),
+      [key]: Math.min(limits.max, Math.max(limits.min, value)),
     }));
   };
 
@@ -70,6 +129,25 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
     },
   ];
 
+  const handleSaveSettings = () => {
+    const payload = {
+      sessionDurationSeconds,
+      breathing,
+      animationSpeed,
+    };
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(payload));
+    setSaveStatus("saved");
+    window.setTimeout(() => {
+      setSaveStatus("idle");
+    }, 1500);
+  };
+
+  const handleResetDefaults = () => {
+    setSessionDurationSeconds(DEFAULT_SETTINGS.sessionDurationSeconds);
+    setBreathing(DEFAULT_SETTINGS.breathing);
+    setAnimationSpeed(DEFAULT_SETTINGS.animationSpeed);
+    localStorage.removeItem(SETTINGS_STORAGE_KEY);
+  };
 
   return (
     <div className="settings-page">
@@ -366,11 +444,17 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
         </div>
 
         <div className="settings-actions">
-          <button className="settings-action settings-action-outline">
+          <button
+            className="settings-action settings-action-outline"
+            onClick={handleResetDefaults}
+          >
             Reset to Defaults
           </button>
-          <button className="settings-action settings-action-primary">
-            Save Settings
+          <button
+            className="settings-action settings-action-primary"
+            onClick={handleSaveSettings}
+          >
+            {saveStatus === "saved" ? "Saved" : "Save Settings"}
           </button>
         </div>
       </div>
