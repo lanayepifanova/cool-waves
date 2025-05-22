@@ -3,6 +3,7 @@ import { ShaderCanvas } from "./components/ShaderCanvas";
 import { CenterBreathDisplay } from "./components/CenterBreathDisplay";
 import { motion } from "framer-motion";
 import { Button } from "./components/ui/button";
+import { Slider } from "./components/ui/slider";
 import "./styles/sonner-fixes.css";
 import "./styles/input-fixes.css";
 
@@ -63,7 +64,7 @@ export default function App() {
   const [sessionMinutes, setSessionMinutes] = useState(5);
   const [sessionRemainingMs, setSessionRemainingMs] = useState(sessionMinutes * 60 * 1000);
   const [showSessionComplete, setShowSessionComplete] = useState(false);
-  const shaderSpeed = 0.2;
+  const [shaderSpeed, setShaderSpeed] = useState(0.2);
   const [showSettings, setShowSettings] = useState(false);
 
   const currentPattern = breathPatterns.find(
@@ -259,6 +260,19 @@ export default function App() {
               </div>
               <div className="mt-8 text-[9px] font-light uppercase tracking-[0.3em] text-white/55">
                 Speed
+              </div>
+              <div className="mt-4 flex items-center gap-3">
+                <Slider
+                  value={[shaderSpeed]}
+                  min={0.1}
+                  max={1}
+                  step={0.05}
+                  onValueChange={(value) => setShaderSpeed(value[0])}
+                  className="w-full [&_[data-slot=slider-track]]:h-1.5 [&_[data-slot=slider-track]]:bg-white/10 [&_[data-slot=slider-range]]:bg-white/70 [&_[data-slot=slider-thumb]]:size-3 [&_[data-slot=slider-thumb]]:border-white/50 [&_[data-slot=slider-thumb]]:bg-white"
+                />
+                <span className="text-[9px] font-light uppercase tracking-[0.24em] text-white/50">
+                  {Math.round(shaderSpeed * 100)}%
+                </span>
               </div>
             </div>
           )}
