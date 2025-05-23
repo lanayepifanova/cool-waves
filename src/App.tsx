@@ -3,6 +3,7 @@ import { ShaderCanvas } from "./components/ShaderCanvas";
 import { CenterBreathDisplay } from "./components/CenterBreathDisplay";
 import { motion } from "framer-motion";
 import { Button } from "./components/ui/button";
+import SettingsPage from "./components/SettingsPage";
 import "./styles/sonner-fixes.css";
 import "./styles/input-fixes.css";
 
@@ -63,6 +64,7 @@ export default function App() {
   const [sessionMinutes, setSessionMinutes] = useState(5);
   const [sessionRemainingMs, setSessionRemainingMs] = useState(sessionMinutes * 60 * 1000);
   const [showSessionComplete, setShowSessionComplete] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const shaderSpeed = 0.2;
 
   const currentPattern = breathPatterns.find(
@@ -199,6 +201,10 @@ export default function App() {
   const timeLeftSeconds = Math.max(0, Math.ceil(phaseTimeLeftMs / 1000));
   const phaseScale = phaseScaleTargets[currentPhase.key];
   const phaseShaderId = phaseShaderTargets[currentPhase.key];
+  if (showSettings) {
+    return <SettingsPage onClose={() => setShowSettings(false)} />;
+  }
+
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center relative">
       <div className="relative flex flex-col items-center justify-center">
@@ -243,6 +249,7 @@ export default function App() {
             variant="ghost"
             size="sm"
             className="h-7 rounded-full border border-white/20 bg-white/10 px-3 text-[9px] font-semibold uppercase tracking-[0.26em] text-white/85 shadow-[0_0_0_1px_rgba(255,255,255,0.06)] hover:bg-white/15"
+            onClick={() => setShowSettings(true)}
           >
             Settings
           </Button>
