@@ -258,10 +258,11 @@ export default function App() {
               <div className="text-[9px] font-light uppercase tracking-[0.3em] text-white/60">
                 Session
               </div>
-              <div className="mt-8 text-[9px] font-light uppercase tracking-[0.3em] text-white/55">
+              <div className="mt-8 h-4" />
+              <div className="text-[9px] font-light uppercase tracking-[0.3em] text-white/55">
                 Speed
               </div>
-              <div className="mt-4 flex items-center gap-3">
+              <div className="mt-4 flex flex-col gap-2">
                 <Slider
                   value={[shaderSpeed]}
                   min={0.1}
@@ -269,11 +270,12 @@ export default function App() {
                   step={0.05}
                   orientation="horizontal"
                   onValueChange={(value) => setShaderSpeed(value[0])}
-                  className="w-36 [&_[data-slot=slider-track]]:h-1.5 [&_[data-slot=slider-track]]:bg-white/10 [&_[data-slot=slider-range]]:bg-white/70 [&_[data-slot=slider-thumb]]:size-3 [&_[data-slot=slider-thumb]]:border-white/50 [&_[data-slot=slider-thumb]]:bg-white"
+                  className="w-44 [&_[data-slot=slider-track]]:h-1.5 [&_[data-slot=slider-track]]:bg-white/10 [&_[data-slot=slider-range]]:bg-white/70 [&_[data-slot=slider-thumb]]:size-3.5 [&_[data-slot=slider-thumb]]:border-white/60 [&_[data-slot=slider-thumb]]:bg-white"
+                  aria-label="Animation speed"
                 />
-                <span className="text-[9px] font-light uppercase tracking-[0.24em] text-white/50">
+                <div className="text-right text-[9px] font-light uppercase tracking-[0.24em] text-white/50">
                   {Math.round(shaderSpeed * 100)}%
-                </span>
+                </div>
               </div>
             </div>
           )}
