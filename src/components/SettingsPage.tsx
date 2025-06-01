@@ -21,7 +21,7 @@ const SETTINGS_STORAGE_KEY = "meditationSettings";
 
 export default function SettingsPage({ onClose }: SettingsPageProps) {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(["session", "breathing", "animation"]),
+    new Set(["session"]),
   );
   const [saveStatus, setSaveStatus] = useState<"idle" | "saved">("idle");
 
