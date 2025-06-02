@@ -75,9 +75,10 @@ export const ShaderCanvas = ({
     const buffers = initBuffers(gl);
     let startTime = Date.now();
 
-    // Set canvas size
-    canvas.width = size;
-    canvas.height = size;
+    // Set canvas size with device pixel ratio for sharp rendering
+    const pixelRatio = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(size * pixelRatio);
+    canvas.height = Math.floor(size * pixelRatio);
     gl.viewport(0, 0, canvas.width, canvas.height);
 
     // Render function
