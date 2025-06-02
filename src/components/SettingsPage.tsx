@@ -179,12 +179,15 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
                     <div className="settings-stack">
                       <div className="settings-block">
                         <div className="settings-row">
-                          <label className="settings-label">Session Duration</label>
+                          <label className="settings-label" htmlFor="session-duration">
+                            Session Duration
+                          </label>
                           <span className="settings-value">
                             {formatDuration(sessionDurationSeconds)}
                           </span>
                         </div>
                         <input
+                          id="session-duration"
                           type="range"
                           className="settings-slider"
                           value={sessionDurationSeconds}
@@ -219,7 +222,9 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
                       <div className="settings-stack">
                         <div className="settings-stepper">
                           <div className="settings-row">
-                            <label className="settings-label">Inhale</label>
+                            <label className="settings-label" htmlFor="breath-inhale">
+                              Inhale
+                            </label>
                             <div className="settings-stepper-controls">
                               <button
                                 className="settings-stepper-button"
@@ -243,6 +248,7 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
                             </div>
                           </div>
                           <input
+                            id="breath-inhale"
                             type="range"
                             className="settings-slider"
                             value={breathing.inhale}
@@ -257,7 +263,9 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
 
                         <div className="settings-stepper">
                           <div className="settings-row">
-                            <label className="settings-label">Hold</label>
+                            <label className="settings-label" htmlFor="breath-hold">
+                              Hold
+                            </label>
                             <div className="settings-stepper-controls">
                               <button
                                 className="settings-stepper-button"
@@ -281,6 +289,7 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
                             </div>
                           </div>
                           <input
+                            id="breath-hold"
                             type="range"
                             className="settings-slider"
                             value={breathing.hold}
@@ -295,7 +304,9 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
 
                         <div className="settings-stepper">
                           <div className="settings-row">
-                            <label className="settings-label">Exhale</label>
+                            <label className="settings-label" htmlFor="breath-exhale">
+                              Exhale
+                            </label>
                             <div className="settings-stepper-controls">
                               <button
                                 className="settings-stepper-button"
@@ -319,6 +330,7 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
                             </div>
                           </div>
                           <input
+                            id="breath-exhale"
                             type="range"
                             className="settings-slider"
                             value={breathing.exhale}
@@ -333,7 +345,9 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
 
                         <div className="settings-stepper">
                           <div className="settings-row">
-                            <label className="settings-label">Rest</label>
+                            <label className="settings-label" htmlFor="breath-rest">
+                              Rest
+                            </label>
                             <div className="settings-stepper-controls">
                               <button
                                 className="settings-stepper-button"
@@ -357,6 +371,7 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
                             </div>
                           </div>
                           <input
+                            id="breath-rest"
                             type="range"
                             className="settings-slider"
                             value={breathing.rest}
@@ -376,12 +391,15 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
                     <div className="settings-stack">
                       <div className="settings-block">
                         <div className="settings-row">
-                          <label className="settings-label">Animation Speed</label>
+                          <label className="settings-label" htmlFor="animation-speed">
+                            Animation Speed
+                          </label>
                           <span className="settings-value">
                             {animationSpeed.toFixed(1)}x
                           </span>
                         </div>
                         <input
+                          id="animation-speed"
                           type="range"
                           className="settings-slider"
                           value={animationSpeed}

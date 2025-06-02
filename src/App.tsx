@@ -273,6 +273,7 @@ export default function App() {
         <button
           className="app-settings-button"
           onClick={() => setShowSettings(true)}
+          aria-label="Open settings"
         >
           Settings
         </button>
