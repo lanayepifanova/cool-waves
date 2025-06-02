@@ -1,5 +1,10 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { ArrowLeft, ChevronDown } from "lucide-react";
+import {
+  DEFAULT_SETTINGS,
+  breathPatterns,
+  breathingLimits,
+} from "../data/breathing";
 
 interface SettingSection {
   id: string;
@@ -13,26 +18,6 @@ type SettingsPageProps = {
 };
 
 const SETTINGS_STORAGE_KEY = "meditationSettings";
-const DEFAULT_SETTINGS = {
-  sessionDurationSeconds: 600,
-  breathing: {
-    inhale: 4,
-    hold: 4,
-    exhale: 4,
-    rest: 2,
-  },
-  animationSpeed: 1,
-};
-
-const breathingLimits: Record<
-  keyof typeof DEFAULT_SETTINGS.breathing,
-  { min: number; max: number }
-> = {
-  inhale: { min: 1, max: 10 },
-  hold: { min: 1, max: 10 },
-  exhale: { min: 1, max: 10 },
-  rest: { min: 0, max: 5 },
-};
 
 export default function SettingsPage({ onClose }: SettingsPageProps) {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
@@ -219,38 +204,15 @@ export default function SettingsPage({ onClose }: SettingsPageProps) {
                       <div className="settings-block">
                         <p className="settings-helper">Preset Patterns</p>
                         <div className="settings-grid settings-grid-2">
-                          <button
-                            onClick={() =>
-                              setBreathing({ inhale: 4, hold: 4, exhale: 4, rest: 2 })
-                            }
-                            className="settings-pill"
-                          >
-                            Box Breathing
-                          </button>
-                          <button
-                            onClick={() =>
-                              setBreathing({ inhale: 4, hold: 7, exhale: 8, rest: 0 })
-                            }
-                            className="settings-pill"
-                          >
-                            4-7-8 Breathing
-                          </button>
-                          <button
-                            onClick={() =>
-                              setBreathing({ inhale: 5, hold: 0, exhale: 5, rest: 0 })
-                            }
-                            className="settings-pill"
-                          >
-                            Equal Breathing
-                          </button>
-                          <button
-                            onClick={() =>
-                              setBreathing({ inhale: 3, hold: 0, exhale: 6, rest: 0 })
-                            }
-                            className="settings-pill"
-                          >
-                            Relaxing Breath
-                          </button>
+                          {breathPatterns.map((pattern) => (
+                            <button
+                              key={pattern.id}
+                              onClick={() => setBreathing(pattern.durations)}
+                              className="settings-pill"
+                            >
+                              {pattern.name}
+                            </button>
+                          ))}
                         </div>
                       </div>
 
