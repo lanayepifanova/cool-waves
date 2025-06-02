@@ -98,6 +98,11 @@ export default function App() {
     setPhaseTimeLeftMs(phases[0].duration * 1000);
   };
 
+  const toggleSessionRunning = () => {
+    if (sessionRemainingMs <= 0) return;
+    setIsRunning((prev) => !prev);
+  };
+
   // Set dark mode
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -249,6 +254,7 @@ export default function App() {
           >
             <ShaderCanvas
               size={canvasSize}
+              onClick={toggleSessionRunning}
               hasActiveReminders={false}
               hasUpcomingReminders={false}
               shaderId={phaseShaderId}
