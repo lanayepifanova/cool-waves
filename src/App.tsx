@@ -34,6 +34,8 @@ export default function App() {
   );
   const [settingsSnapshot, setSettingsSnapshot] = useState<string | null>(null);
   const shaderSpeed = 0.2 * animationSpeed;
+  const isPaused = !isRunning && sessionRemainingMs > 0;
+  const effectiveShaderSpeed = isPaused ? 0 : shaderSpeed;
 
   const currentDurations = breathingDurations;
 
@@ -258,7 +260,7 @@ export default function App() {
               hasActiveReminders={false}
               hasUpcomingReminders={false}
               shaderId={phaseShaderId}
-              timeScale={shaderSpeed}
+              timeScale={effectiveShaderSpeed}
             />
 
             <CenterBreathDisplay
@@ -273,6 +275,7 @@ export default function App() {
       <div className="app-session-badge">
         <div className="app-session-pill">
           Session · {formatSessionTime(sessionRemainingMs)}
+          {isPaused ? " · Paused" : ""}
         </div>
       </div>
       <div className="app-settings">
