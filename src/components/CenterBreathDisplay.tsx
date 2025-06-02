@@ -5,14 +5,12 @@ interface CenterBreathDisplayProps {
   size: number;
   phaseLabel: string;
   timeLeftSeconds: number;
-  patternName: string;
 }
 
 export const CenterBreathDisplay = ({
   size,
   phaseLabel,
   timeLeftSeconds,
-  patternName,
 }: CenterBreathDisplayProps) => {
   const [displaySize, setDisplaySize] = useState(size * 0.7);
 

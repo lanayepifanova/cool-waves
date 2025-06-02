@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import SettingsPage from "./components/SettingsPage";
 import {
   DEFAULT_SETTINGS,
-  breathPatterns,
   breathingLimits,
   type BreathPhaseKey,
 } from "./data/breathing";
@@ -14,7 +13,6 @@ const SETTINGS_STORAGE_KEY = "meditationSettings";
 
 export default function App() {
   const [canvasSize, setCanvasSize] = useState(600);
-  const [selectedPatternId, setSelectedPatternId] = useState(breathPatterns[0].id);
   const [isRunning, setIsRunning] = useState(true);
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [phaseTimeLeftMs, setPhaseTimeLeftMs] = useState(
@@ -37,17 +35,7 @@ export default function App() {
   const [settingsSnapshot, setSettingsSnapshot] = useState<string | null>(null);
   const shaderSpeed = 0.2 * animationSpeed;
 
-  const currentPattern = breathPatterns.find(
-    (pattern) => pattern.id === selectedPatternId,
-  );
-
   const currentDurations = breathingDurations;
-  const matchesPattern =
-    currentPattern &&
-    (Object.keys(currentPattern.durations) as BreathPhaseKey[]).every(
-      (key) => currentPattern.durations[key] === currentDurations[key],
-    );
-  const patternName = matchesPattern ? currentPattern?.name ?? "Breathwork" : "Custom";
 
   const phases = useMemo(
     () => [
@@ -113,13 +101,6 @@ export default function App() {
   // Set dark mode
   useEffect(() => {
     document.documentElement.classList.add("dark");
-  }, []);
-
-  useEffect(() => {
-    const savedPattern = localStorage.getItem("selectedPattern");
-    if (savedPattern && breathPatterns.some((pattern) => pattern.id === savedPattern)) {
-      setSelectedPatternId(savedPattern);
-    }
   }, []);
 
   const applySettings = (settings: typeof DEFAULT_SETTINGS, snapshot: string | null) => {
@@ -197,10 +178,6 @@ export default function App() {
       readSettings();
     }
   }, [showSettings]);
-
-  useEffect(() => {
-    localStorage.setItem("selectedPattern", selectedPatternId);
-  }, [selectedPatternId]);
 
   // Adjust canvas size based on window size
   useEffect(() => {
@@ -282,7 +259,6 @@ export default function App() {
               size={canvasSize}
               phaseLabel={currentPhase.label}
               timeLeftSeconds={timeLeftSeconds}
-              patternName={patternName}
             />
           </motion.div>
         </motion.div>
