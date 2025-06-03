@@ -3,6 +3,7 @@ import { ShaderCanvas } from "./components/ShaderCanvas";
 import { CenterBreathDisplay } from "./components/CenterBreathDisplay";
 import { motion } from "framer-motion";
 import SettingsPage from "./components/SettingsPage";
+import { shaders } from "./components/util/shaders";
 import {
   DEFAULT_SETTINGS,
   breathingLimits,
@@ -13,6 +14,7 @@ const SETTINGS_STORAGE_KEY = "meditationSettings";
 
 export default function App() {
   const [canvasSize, setCanvasSize] = useState(600);
+  const [selectedShaderId, setSelectedShaderId] = useState(shaders[0].id);
   const [isRunning, setIsRunning] = useState(true);
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [phaseTimeLeftMs, setPhaseTimeLeftMs] = useState(
@@ -57,12 +59,6 @@ export default function App() {
     hold: largeScale,
     exhale: smallScale,
     rest: smallScale,
-  };
-  const phaseShaderTargets: Record<BreathPhaseKey, number> = {
-    inhale: 1,
-    hold: 3,
-    exhale: 2,
-    rest: 4,
   };
   const phaseTransition = useMemo(() => {
     const inhaleDuration = Math.max(0.01, currentDurations.inhale);
@@ -233,21 +229,15 @@ export default function App() {
   }, [isRunning, phaseIndex, phaseTimeLeftMs, phases, sessionRemainingMs]);
 
   const timeLeftSeconds = Math.max(0, Math.ceil(phaseTimeLeftMs / 1000));
-  const phaseScale = phaseScaleTargets[currentPhase.key];
-  const phaseShaderId = phaseShaderTargets[currentPhase.key];
-  const phaseDurationMs = Math.max(0, currentPhase.duration * 1000);
-  const phaseProgress =
-    phaseDurationMs > 0 ? 1 - phaseTimeLeftMs / phaseDurationMs : 0;
+  const phaseScale = smallScale;
   const sessionDurationMs = Math.max(1, sessionDurationSeconds * 1000);
   const sessionProgress = 1 - sessionRemainingMs / sessionDurationMs;
-  const clampedPhaseProgress = Math.min(1, Math.max(0, phaseProgress));
   const clampedSessionProgress = Math.min(1, Math.max(0, sessionProgress));
   const ringSize = canvasSize * 1.08;
   const ringStroke = Math.max(4, canvasSize * 0.012);
   const outerRadius = ringSize / 2 - ringStroke / 2;
-  const innerRadius = outerRadius - ringStroke * 1.6;
   const outerCircumference = 2 * Math.PI * outerRadius;
-  const innerCircumference = 2 * Math.PI * innerRadius;
+  const stylePreviewSize = 18;
   if (showSettings) {
     return <SettingsPage onClose={() => setShowSettings(false)} />;
   }
@@ -293,24 +283,6 @@ export default function App() {
                       outerCircumference * (1 - clampedSessionProgress)
                     }
                   />
-                  <circle
-                    className="app-progress-track"
-                    cx={ringSize / 2}
-                    cy={ringSize / 2}
-                    r={innerRadius}
-                    strokeWidth={ringStroke * 0.75}
-                  />
-                  <circle
-                    className="app-progress-phase"
-                    cx={ringSize / 2}
-                    cy={ringSize / 2}
-                    r={innerRadius}
-                    strokeWidth={ringStroke * 0.75}
-                    strokeDasharray={innerCircumference}
-                    strokeDashoffset={
-                      innerCircumference * (1 - clampedPhaseProgress)
-                    }
-                  />
                 </g>
               </svg>
             </div>
@@ -319,7 +291,7 @@ export default function App() {
               onClick={toggleSessionRunning}
               hasActiveReminders={false}
               hasUpcomingReminders={false}
-              shaderId={phaseShaderId}
+              shaderId={selectedShaderId}
               timeScale={effectiveShaderSpeed}
             />
 
@@ -337,6 +309,29 @@ export default function App() {
           Session · {formatSessionTime(sessionRemainingMs)}
           {isPaused ? " · Paused" : ""}
         </div>
+      </div>
+      <div className="app-style-switcher" aria-label="Select visual style">
+        {shaders.map((shader) => (
+          <button
+            key={shader.id}
+            className={`app-style-button ${
+              selectedShaderId === shader.id ? "is-active" : ""
+            }`}
+            onClick={() => setSelectedShaderId(shader.id)}
+            aria-label={shader.name}
+          >
+            <span className="app-style-preview">
+              <ShaderCanvas
+                size={stylePreviewSize}
+                hasActiveReminders={false}
+                hasUpcomingReminders={false}
+                shaderId={shader.id}
+                timeScale={0.2}
+                isInteractive={false}
+              />
+            </span>
+          </button>
+        ))}
       </div>
       <div className="app-settings">
         <button

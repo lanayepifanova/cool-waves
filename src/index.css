@@ -150,6 +150,41 @@ input:focus-visible {
   padding: 0 8px;
 }
 
+.app-style-switcher {
+  position: fixed;
+  left: 12px;
+  top: 12px;
+  z-index: 30;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  max-width: 220px;
+}
+
+.app-style-button {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-style-button.is-active {
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.app-style-preview {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .app-session-pill {
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.15);

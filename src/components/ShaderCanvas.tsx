@@ -8,6 +8,7 @@ interface ShaderCanvasProps {
   hasUpcomingReminders?: boolean;
   shaderId?: number;
   timeScale?: number;
+  isInteractive?: boolean;
 }
 
 export const ShaderCanvas = ({ 
@@ -17,6 +18,7 @@ export const ShaderCanvas = ({
   hasUpcomingReminders = false,
   shaderId = 1,
   timeScale = 0.2,
+  isInteractive = true,
 }: ShaderCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>(0);
@@ -280,18 +282,18 @@ export const ShaderCanvas = ({
       style={{ 
         width: size, 
         height: size,
-        transform: isHovered ? 'scale(1.03)' : 'scale(1)',
-        cursor: 'pointer',
-        boxShadow: hasActiveReminders 
+        transform: isInteractive && isHovered ? 'scale(1.03)' : 'scale(1)',
+        cursor: isInteractive ? 'pointer' : 'default',
+        boxShadow: isInteractive && hasActiveReminders 
           ? '0 0 30px rgba(66, 153, 225, 0.4)' 
-          : hasUpcomingReminders
+          : isInteractive && hasUpcomingReminders
             ? '0 0 30px rgba(72, 187, 120, 0.4)'
-            : (isHovered ? '0 0 30px rgba(255, 255, 255, 0.2)' : 'none')
+            : (isInteractive && isHovered ? '0 0 30px rgba(255, 255, 255, 0.2)' : 'none')
       }}
-      onClick={onClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      onMouseMove={handleMouseMove}
+      onClick={isInteractive ? onClick : undefined}
+      onMouseEnter={isInteractive ? () => setIsHovered(true) : undefined}
+      onMouseLeave={isInteractive ? handleMouseLeave : undefined}
+      onMouseMove={isInteractive ? handleMouseMove : undefined}
     />
   );
 }
