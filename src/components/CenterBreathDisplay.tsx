@@ -32,9 +32,6 @@ export const CenterBreathDisplay = ({
         transition={{ duration: 0.3 }}
         className="breath-display-inner"
       >
-        <div className="breath-phase">
-          {phaseLabel}
-        </div>
         <div className="breath-time">
           {timeLeftSeconds}s
         </div>
