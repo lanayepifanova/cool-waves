@@ -80,21 +80,23 @@ button {
 }
 
 .breath-phase {
-  font-family: "Instrument Serif", serif;
-  font-style: italic;
-  font-weight: 500;
-  font-size: 26px;
+  font-family: "Inter", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
   color: rgba(255, 255, 255, 0.7);
-  mix-blend-mode: screen;
+  margin-bottom: 10px;
 }
 
 .breath-time {
-  margin-top: 12px;
-  font-size: 46px;
+  font-family: "Inter", sans-serif;
+  font-size: 26px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.08em;
   color: #fff;
 }
+
 
 .app-session-badge {
   position: fixed;
@@ -353,11 +355,17 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .settings-label {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+  padding: 4px 0 2px;
+  font-family: "Inter", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
 }
 
 .settings-value {
@@ -434,11 +442,12 @@ button {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-left: auto;
 }
 
 .settings-stepper-button {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 6px;
   border: none;
   background: #1a1a1a;
@@ -450,7 +459,7 @@ button {
 }
 
 .settings-stepper-value {
-  width: 36px;
+  width: 32px;
   text-align: center;
   font-weight: 600;
 }
