@@ -109,6 +109,12 @@ export default function App() {
     exhale: 0.92,
     rest: 0.96,
   };
+  const phaseShaderTargets: Record<BreathPhaseKey, number> = {
+    inhale: 1,
+    hold: 3,
+    exhale: 2,
+    rest: 4,
+  };
 
   // Set dark mode
   useEffect(() => {
@@ -165,6 +171,7 @@ export default function App() {
 
   const timeLeftSeconds = Math.max(0, Math.ceil(phaseTimeLeftMs / 1000));
   const phaseScale = phaseScaleTargets[currentPhase.key];
+  const phaseShaderId = phaseShaderTargets[currentPhase.key];
 
   const handlePatternSelect = (id: string) => {
     setSelectedPatternId(id);
@@ -208,7 +215,7 @@ export default function App() {
               onClick={() => setShowSettings(true)}
               hasActiveReminders={false}
               hasUpcomingReminders={false}
-              shaderId={currentPattern?.shaderId ?? 1}
+              shaderId={phaseShaderId}
             />
 
             <CenterBreathDisplay

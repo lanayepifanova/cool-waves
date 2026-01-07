@@ -32,21 +32,21 @@ export const CenterBreathDisplay = ({
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3 }}
-        className="flex h-full w-full flex-col items-center justify-center rounded-full border border-white/10 bg-black/30 p-6 text-center text-white backdrop-blur-lg"
+        className="flex h-full w-full flex-col items-center justify-center p-6 text-center text-white"
       >
         <span className="text-[11px] uppercase tracking-[0.35em] text-white/60">
           Breathwork Studio
         </span>
-        <div className="mt-6 text-[26px] font-[Instrument Serif] text-white">
+        <div className="mt-6 text-[26px] font-[Instrument Serif] font-bold text-white">
           {phaseLabel}
         </div>
-        <div className="mt-3 text-[46px] font-medium tracking-tight text-white">
+        <div className="mt-3 text-[46px] font-bold tracking-tight text-white">
           {timeLeftSeconds}s
         </div>
         <div className="mt-4 text-[12px] text-white/60">
           {isRunning ? "Shoulders soft. Jaw relaxed." : "Paused. Tap play to resume."}
         </div>
-        <div className="mt-3 text-[11px] uppercase tracking-[0.24em] text-white/40">
+        <div className="mt-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/40">
           {patternName}
         </div>
       </motion.div>
