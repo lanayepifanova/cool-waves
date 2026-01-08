@@ -103,11 +103,13 @@ export default function App() {
   );
 
   const currentPhase = phases[phaseIndex];
+  const smallScale = 0.9;
+  const largeScale = 1.08;
   const phaseScaleTargets: Record<BreathPhaseKey, number> = {
-    inhale: 1.08,
-    hold: 1.08,
-    exhale: 0.92,
-    rest: 0.96,
+    inhale: largeScale,
+    hold: largeScale,
+    exhale: smallScale,
+    rest: smallScale,
   };
   const phaseShaderTargets: Record<BreathPhaseKey, number> = {
     inhale: 1,
@@ -115,6 +117,25 @@ export default function App() {
     exhale: 2,
     rest: 4,
   };
+  const phaseTransition = useMemo(() => {
+    const inhaleDuration = Math.max(0.01, currentDurations.inhale);
+    const holdDuration = Math.max(0.01, currentDurations.hold);
+    const exhaleDuration = Math.max(0.01, currentDurations.exhale);
+    const restDuration = Math.max(0.01, currentDurations.rest);
+
+    switch (currentPhase.key) {
+      case "inhale":
+        return { duration: inhaleDuration, ease: [0.2, 0, 0.2, 1] };
+      case "hold":
+        return { duration: holdDuration, ease: "linear" };
+      case "exhale":
+        return { duration: exhaleDuration, ease: [0.4, 0, 0.2, 1] };
+      case "rest":
+        return { duration: restDuration, ease: "linear" };
+      default:
+        return { duration: 0.2, ease: "linear" };
+    }
+  }, [currentPhase.key, currentDurations]);
 
   // Set dark mode
   useEffect(() => {
@@ -203,8 +224,9 @@ export default function App() {
           className="relative"
         >
           <motion.div
+            initial={{ scale: smallScale }}
             animate={{ scale: phaseScale }}
-            transition={{ type: "spring", damping: 22, stiffness: 120, mass: 0.6 }}
+            transition={phaseTransition}
             className="relative"
           >
             <ShaderCanvas
@@ -252,20 +274,22 @@ export default function App() {
       <Sheet open={showSettings} onOpenChange={setShowSettings}>
         <SheetContent
           side="right"
-          className="top-4 bottom-auto right-4 h-auto max-h-[90vh] w-[min(92vw,360px)] rounded-2xl border border-white/10 bg-black/90 text-white backdrop-blur-xl"
+          className="top-4 bottom-auto right-4 h-auto max-h-[70vh] w-[min(90vw,320px)] rounded-2xl border border-white/10 bg-black/90 text-white backdrop-blur-xl"
         >
           <SheetHeader>
-            <SheetTitle className="text-white">Edit Breath Pattern</SheetTitle>
+            <SheetTitle className="text-sm font-semibold tracking-[0.08em] text-white/70 uppercase">
+              Edit Breath Pattern
+            </SheetTitle>
             <SheetDescription className="text-white/60">
               Tune the tempo for {currentPattern?.name ?? "your practice"}.
             </SheetDescription>
           </SheetHeader>
-          <div className="space-y-6 px-4 pb-6">
+          <div className="space-y-4 px-4 pb-4">
             {phases.map((phase) => (
               <div key={phase.key} className="space-y-3">
-                <div className="flex items-center justify-between text-sm text-white">
-                  <span>{phase.label}</span>
-                  <div className="flex items-center gap-2 text-white/60">
+                <div className="flex items-center justify-between gap-4 text-sm text-white">
+                  <span className="text-white/90">{phase.label}</span>
+                  <div className="flex items-center gap-3 text-white/50">
                     <Input
                       type="number"
                       inputMode="numeric"
@@ -276,19 +300,12 @@ export default function App() {
                       onChange={(event) =>
                         handleDurationInput(phase.key, event.target.value)
                       }
-                      className="h-8 w-14 rounded-lg border-white/20 bg-white/5 text-right text-white"
+                      className="h-7 w-12 rounded-md border-white/10 bg-white/3 px-2 text-right text-xs text-white/80 shadow-none"
                       aria-label={`${phase.label} seconds`}
                     />
                     <span>seconds</span>
                   </div>
                 </div>
-                <Slider
-                  value={[currentDurations[phase.key]]}
-                  min={0}
-                  max={12}
-                  step={1}
-                  onValueChange={(value) => updateDuration(phase.key, value[0])}
-                />
               </div>
             ))}
           </div>

@@ -32,7 +32,7 @@ export const CenterBreathDisplay = ({
         transition={{ duration: 0.3 }}
         className="flex h-full w-full flex-col items-center justify-center p-6 text-center text-white"
       >
-        <div className="text-[26px] font-[Instrument Serif] font-bold text-white">
+        <div className="text-[26px] font-[Instrument Serif] italic font-medium text-white/70 mix-blend-screen">
           {phaseLabel}
         </div>
         <div className="mt-3 text-[46px] font-bold tracking-tight text-white">
