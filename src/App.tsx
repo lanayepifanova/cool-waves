@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
 import { ShaderCanvas } from "./components/ShaderCanvas";
-import { PatternSelector } from "./components/PatternSelector";
 import { CenterBreathDisplay } from "./components/CenterBreathDisplay";
 import { motion } from "framer-motion";
 import { Button } from "./components/ui/button";
@@ -173,10 +172,6 @@ export default function App() {
   const phaseScale = phaseScaleTargets[currentPhase.key];
   const phaseShaderId = phaseShaderTargets[currentPhase.key];
 
-  const handlePatternSelect = (id: string) => {
-    setSelectedPatternId(id);
-  };
-
   const updateDuration = (key: BreathPhaseKey, value: number) => {
     if (!currentPattern) return;
     setPatternDurations((prev) => ({
@@ -190,12 +185,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative">
-      <PatternSelector
-        patterns={breathPatterns}
-        selectedPatternId={selectedPatternId}
-        onSelect={handlePatternSelect}
-      />
-
       {/* Main layout container with shader */}
       <div className="relative flex flex-col items-center justify-center">
         {/* Shader Circle */}
