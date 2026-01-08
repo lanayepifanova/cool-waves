@@ -6,7 +6,6 @@ interface CenterBreathDisplayProps {
   phaseLabel: string;
   timeLeftSeconds: number;
   patternName: string;
-  isRunning: boolean;
 }
 
 export const CenterBreathDisplay = ({
@@ -14,7 +13,6 @@ export const CenterBreathDisplay = ({
   phaseLabel,
   timeLeftSeconds,
   patternName,
-  isRunning,
 }: CenterBreathDisplayProps) => {
   const [displaySize, setDisplaySize] = useState(size * 0.7);
 
@@ -34,17 +32,11 @@ export const CenterBreathDisplay = ({
         transition={{ duration: 0.3 }}
         className="flex h-full w-full flex-col items-center justify-center p-6 text-center text-white"
       >
-        <span className="text-[11px] uppercase tracking-[0.35em] text-white/60">
-          Breathwork Studio
-        </span>
-        <div className="mt-6 text-[26px] font-[Instrument Serif] font-bold text-white">
+        <div className="text-[26px] font-[Instrument Serif] font-bold text-white">
           {phaseLabel}
         </div>
         <div className="mt-3 text-[46px] font-bold tracking-tight text-white">
           {timeLeftSeconds}s
-        </div>
-        <div className="mt-4 text-[12px] text-white/60">
-          {isRunning ? "Shoulders soft. Jaw relaxed." : "Paused. Tap play to resume."}
         </div>
         <div className="mt-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/40">
           {patternName}

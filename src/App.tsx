@@ -212,12 +212,14 @@ export default function App() {
               phaseLabel={currentPhase.label}
               timeLeftSeconds={timeLeftSeconds}
               patternName={currentPattern?.name ?? "Breathwork"}
-              isRunning={isRunning}
             />
           </motion.div>
         </motion.div>
 
       <div className="fixed left-4 top-4 z-20">
+        <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/60">
+          {currentPattern?.name ?? "Breathwork"}
+        </div>
         <Button
           variant="secondary"
           size="sm"
@@ -241,8 +243,8 @@ export default function App() {
 
       <Sheet open={showSettings} onOpenChange={setShowSettings}>
         <SheetContent
-          side="bottom"
-          className="border-white/10 bg-black/90 text-white backdrop-blur-xl"
+          side="right"
+          className="top-4 bottom-auto right-4 h-auto max-h-[90vh] w-[min(92vw,360px)] rounded-2xl border border-white/10 bg-black/90 text-white backdrop-blur-xl"
         >
           <SheetHeader>
             <SheetTitle className="text-white">Edit Breath Pattern</SheetTitle>
