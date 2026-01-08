@@ -38,9 +38,6 @@ export const CenterBreathDisplay = ({
         <div className="mt-3 text-[46px] font-bold tracking-tight text-white">
           {timeLeftSeconds}s
         </div>
-        <div className="mt-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/40">
-          {patternName}
-        </div>
       </motion.div>
     </div>
   );

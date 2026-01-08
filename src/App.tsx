@@ -3,6 +3,7 @@ import { ShaderCanvas } from "./components/ShaderCanvas";
 import { CenterBreathDisplay } from "./components/CenterBreathDisplay";
 import { motion } from "framer-motion";
 import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
 import {
   Sheet,
   SheetClose,
@@ -183,6 +184,13 @@ export default function App() {
     }));
   };
 
+  const handleDurationInput = (key: BreathPhaseKey, rawValue: string) => {
+    const parsed = Number(rawValue);
+    if (!Number.isFinite(parsed)) return;
+    const clamped = Math.max(0, Math.min(12, Math.round(parsed)));
+    updateDuration(key, clamped);
+  };
+
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 relative">
       {/* Main layout container with shader */}
@@ -196,7 +204,7 @@ export default function App() {
         >
           <motion.div
             animate={{ scale: phaseScale }}
-            transition={{ duration: Math.max(0.2, currentPhase.duration), ease: "easeInOut" }}
+            transition={{ type: "spring", damping: 22, stiffness: 120, mass: 0.6 }}
             className="relative"
           >
             <ShaderCanvas
@@ -257,7 +265,22 @@ export default function App() {
               <div key={phase.key} className="space-y-3">
                 <div className="flex items-center justify-between text-sm text-white">
                   <span>{phase.label}</span>
-                  <span className="text-white/60">{currentDurations[phase.key]}s</span>
+                  <div className="flex items-center gap-2 text-white/60">
+                    <Input
+                      type="number"
+                      inputMode="numeric"
+                      min={0}
+                      max={12}
+                      step={1}
+                      value={currentDurations[phase.key]}
+                      onChange={(event) =>
+                        handleDurationInput(phase.key, event.target.value)
+                      }
+                      className="h-8 w-14 rounded-lg border-white/20 bg-white/5 text-right text-white"
+                      aria-label={`${phase.label} seconds`}
+                    />
+                    <span>seconds</span>
+                  </div>
                 </div>
                 <Slider
                   value={[currentDurations[phase.key]]}
